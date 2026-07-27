@@ -20,6 +20,7 @@ body{margin:0;background:var(--bg);color:var(--ink);
 .banner{background:var(--warnbg);color:var(--warn);border-bottom:1px solid var(--line);
   padding:9px 14px;font-size:12.5px;text-align:center}
 .banner b{font-weight:600}
+.banner[hidden]{display:none}
 .wrap{max-width:600px;margin:0 auto;padding:0 18px 60px}
 .hd{display:flex;justify-content:space-between;align-items:baseline;
   font-size:12px;color:var(--sub);letter-spacing:1px;margin:22px 0 8px}
@@ -79,7 +80,7 @@ pre{background:var(--card);border:1px solid var(--line);border-radius:9px;paddin
 </style>
 </head>
 <body>
-<div class="banner">📄 <b>样稿</b>　可以随便点，不会真的提交。第 1 题选不同答案，后面走的题也不一样</div>
+<div class="banner" id="banner" hidden>📄 <b>样稿</b>　可以随便点，不会真的提交</div>
 <div class="wrap">
   <div class="hd"><span class="sec" id="sec"></span><span id="cnt"></span></div>
   <div class="bar"><i id="fill"></i></div>
@@ -95,7 +96,11 @@ pre{background:var(--card);border:1px solid var(--line);border-radius:9px;paddin
 (function(){
 "use strict";
 
-var A = {}, histIdx = [], cur = 0, ended = false, q4order = null, pendErr = '';
+// 样稿横幅：只在 ?preview 时出现。正式链接不带参数，物理上不可能忘删。
+var PREVIEW = /[?&]preview\b/.test(location.search);
+if(PREVIEW) document.getElementById('banner').hidden = false;
+
+var A = {}, histIdx = [], cur = 0, ended = false, randOrder = {}, pendErr = '';
 
 function has(id,i){ var v=A[id]; return Array.isArray(v) && v.indexOf(i)>=0; }
 // 三种人群，由 Q1 分流
@@ -103,28 +108,30 @@ var own  = function(){ var v=A['q1']; return v===0||v===1||v===2; };  // 有自�
 var fav  = function(){ return A['q1']===3; };                         // 没自设，但有本命
 var none = function(){ return A['q1']===4; };                         // 都没有
 var hasTA= function(){ return own()||fav(); };                        // 有一个「TA」可以指
+// 碰过角色对话类工具（Q5 的第 5/6/7 项）
+var usedChar = function(){ return has('q5',4)||has('q5',5)||has('q5',6); };
 
 var Q = [
 
-// ===== 开头 =====
+// ================= 开头 =================
 {id:'q1',sec:'你和你的角色',type:'single',req:true,
- note:'学生做的一个小调查，关于大家平时怎么养自己的 OC。匿名，大概三分钟，最后的联系方式是选填。汇总结果整理好之后会发回群里。',
+ note:'学生做的一个小调查，关于大家平时怎么养自己的 OC。匿名（除非你最后自愿留个联系方式），大概三五分钟。没有 OC、不太懂这些词也没关系，一样可以填。汇总结果整理好之后会发回群里。',
  title:'你有自己的自设（OC）吗？',
  opts:['有，1 个','有，2–5 个','有，6 个以上',
-       '没有自设，但有特别喜欢的角色（本命 / 官方角色）','都没有'],
+       '没有自设，但有特别喜欢的角色（动漫、游戏、剧里的都算）','都没有'],
  extra:{id:'q1name',when:hasTA,ph:'TA 的名字或代号，写个昵称也行',
         label:'挑一个你最放在心上的，写下 TA 的名字或代号——后面的题都只针对 TA。'}},
 
-// ===== 「都没有」的短分支 =====
+// ============ 「都没有」的短分支 ============
 {id:'b1',sec:'关于「自己的角色」',type:'single',req:true,show:none,
  title:'你有没有想过要一个属于自己的角色？',
  opts:['一直想，但没真的动手','试过，没弄成','偶尔会想想','没有过']},
 
 {id:'b2',sec:'关于「自己的角色」',type:'single',req:true,show:none,
- title:'如果有个地方，你只要跟它聊聊天，就能慢慢把一个角色的性格、来历弄出来，之后还能跟这个角色说上话——你会想试试吗？',
+ title:'如果有个地方能帮你把一个角色的性格、来历慢慢定下来，之后还能跟这个角色说上话——你会想试试吗？',
  opts:['挺想试的','有点兴趣，看效果','说不好','不太想','完全不想']},
 
-// ===== 了解 OC（3 题）=====
+// ================= 了解 OC =================
 {id:'q2',sec:'你和你的角色',type:'multi',req:true,show:own,
  title:'关于 TA，下面这些你心里已经有答案的有哪些？',
  hint:'想到就算，不用写下来。',
@@ -136,20 +143,51 @@ var Q = [
 {id:'q3',sec:'你和你的角色',type:'multi',req:true,show:hasTA,
  title:'你平时都为 TA 做过些什么？',
  opts:['写文（同人文 / 小说 / 日记体）','写设定集','语C、跟人对戏','跑团带 TA 上场',
-  '让朋友帮忙演 TA、跟你对戏','给 TA 做过角色卡 / 设定卡','找画师约稿 / 自己画图',
-  '给 TA 过生日、约生贺图 / 写生贺文','给 TA 配音 / 找声音素材','做 PV、MAD、动态图',
-  '做 3D 模型 / MMD / VRChat','做周边、印本、表情包','其他',
+  '让朋友帮忙演 TA、跟你对戏','给 TA 整理过设定卡 / 人物卡（跑团那种也算）',
+  '找画师约稿 / 自己画图','给 TA 过生日、约生贺图 / 写生贺文','给 TA 配音 / 找声音素材',
+  '做 PV、MAD、动态图','做 3D 模型 / MMD / VRChat','做周边、印本、表情包',
+  '买过 TA 的周边、谷子','其他',
   '以上都还没做过，TA 主要活在我自己心里'],
- excl:[13],other:[12]},
+ excl:[14],other:[13]},
 
-{id:'q4',sec:'你和你的角色',type:'multi',req:true,lim:3,random:true,show:hasTA,
+// ========== 一些假想的情况（排在 AI 题之前，避免被 AI 语境带偏）==========
+{id:'q7',sec:'一些假想的情况',type:'matrix',req:true,show:hasTA,
+ note:'下面几题说的是一些假想的情况，现实里不一定有。只想知道你的第一反应，不用管现在能不能做到。觉得「完全不行」也是一种答案，和选别的一样有用。',
+ title:'假设有个办法能让 TA 开口，下面每种情况你觉得怎么样？',
+ mnote:'先别管靠什么办法——自己找人、用工具，都算。只看这件事本身你接不接受。',
+ cols:['愿意试试','有条件可以','不太愿意','完全不行'],
+ rows:[
+  {g:'TA 能走到哪一步 · 下面几行都只有你自己看得到',k:'A',t:'TA 能跟你一来一回地说话'},
+  {k:'B',t:'TA 会自己拿主意，把剧情往下推'},
+  {k:'C',t:'同一场戏里还有别的角色在（故事里的配角，不是别人的 OC），跟 TA 有来有往'},
+  {g:'谁能跟 TA 说上话 · 下面几行都假设 TA 已经能开口',k:'D',t:'只有你自己'},
+  {k:'E',t:'你指定的朋友也能跟 TA 说说话'},
+  {k:'F',t:'任何人都能跟 TA 说说话'},
+  {g:'跟别人的角色同台',k:'G',t:'TA 和别人家的孩子，在同一个故事里对戏'}]},
+
+{id:'q8',sec:'一些假想的情况',type:'multi',show:hasTA,
+ title:'刚才有几行你选了「有条件可以」——那个「条件」主要是指什么？',
+ hint:'选填。刚才没选过「有条件可以」的话，直接跳过就行。',
+ opts:['得够像 TA，不能崩','TA 说的话我能改、能撤','只有我自己看得到，不公开',
+  '谁能见到 TA，我说了算','我想删的时候能删掉','其他'],
+ other:[5]},
+
+{id:'q10',sec:'一些假想的情况',type:'single',req:true,show:own,
+ title:'TA 有没有被别人（朋友、语C 搭子、团里、写手）写出过、演出过你没预料到的剧情？',
+ hint:'有过好几次的话，说印象最深的那次就行。',
+ opts:['有，我挺喜欢，收藏了 / 当成 if 线','有，我当没看见，不影响我自己的设定',
+  '有，我去跟对方沟通了','有，之后我就不太敢把设定给别人了','没发生过',
+  '我从来没把 TA 给别人看过']},
+
+// ================= 你平时用什么 =================
+{id:'q4',sec:'你平时用什么',type:'multi',req:true,lim:3,random:true,show:hasTA,
  title:'如果想让 TA 更「活」一点，你会想用什么方式？',
  hint:'最多选 3 个。',
  opts:['自己写文，把 TA 写进故事里','找画师约稿 / 自己画','语C、跟人对戏',
   '跑团带 TA 上场','做动画 / PV / 动态漫','找人帮 TA 配音','让 AI 帮忙',
-  '没特别想过']},
+  '没特别想过'],
+ excl:[7]},
 
-// ===== 你平时用什么（2 题）=====
 {id:'q5',sec:'你平时用什么',type:'multi',req:true,
  title:'下面这些，你碰过哪些？',
  hint:'用过、试过、随便玩过都算。',
@@ -160,60 +198,42 @@ var Q = [
   '都没怎么碰过'],
  excl:[7]},
 
-{id:'q6',sec:'你平时用什么',type:'single',req:true,
+{id:'q6',sec:'你平时用什么',type:'single',req:true,show:usedChar,
  title:'像猫箱、C.AI 这种能跟角色聊天的 App，你后来还在玩吗？',
- opts:['一直在玩','玩过一阵，后来淡了——说话不太像那个角色',
-  '玩过一阵，后来淡了——记不住之前发生的事','玩过一阵，后来淡了——没什么新鲜感了',
-  '玩过一阵，后来淡了——别的原因','没碰过这类东西']},
+ opts:['一直在玩，玩得挺勤','还在玩，但比以前少了','转去玩别的了（酒馆之类）',
+  '玩过一阵，后来淡了——说话不太像那个角色',
+  '玩过一阵，后来淡了——记不住之前发生的事',
+  '玩过一阵，后来淡了——没什么新鲜感了',
+  '玩过一阵，后来淡了——别的原因']},
 
-// ===== 一些假想的情况（5 题）=====
-{id:'q7',sec:'一些假想的情况',type:'matrix',req:true,show:hasTA,
- note:'下面几题说的是一些假想的情况，现实里不一定有。只想知道你的第一反应，不用管现在能不能做到。觉得「完全不行」也是一种答案，和选别的一样有用。',
- title:'假设有个办法能让 TA 开口，下面每种情况你觉得怎么样？',
- mnote:'先别管靠什么办法——自己找人、用工具，都算。只看这件事本身你接不接受。',
- cols:['愿意试试','有条件可以','不太愿意','完全不行'],
- rows:[
-  {g:'TA 能走到哪一步 · 下面几行都只有你自己看得到',k:'A',t:'TA 能跟你一来一回地说话'},
-  {k:'B',t:'TA 会自己拿主意，把剧情往下推'},
-  {k:'C',t:'同一场戏里还有别的角色在，跟 TA 有来有往'},
-  {g:'谁能跟 TA 说上话 · 下面几行都假设 TA 已经能开口',k:'D',t:'只有你自己'},
-  {k:'E',t:'你指定的朋友也能跟 TA 说说话'},
-  {k:'F',t:'任何人都能跟 TA 说说话'},
-  {g:'单独一行',k:'G',t:'TA 和别人的角色，在同一个故事里对戏'}]},
-
-{id:'q8',sec:'一些假想的情况',type:'multi',show:function(){
-  var v=A['q7']; if(!v) return false;
-  for(var i=0;i<v.length;i++) if(v[i]===1) return true; return false; },
- title:'刚才有几行你选了「有条件可以」——那个「条件」主要是指什么？',
- hint:'选填。刚才没选过「有条件可以」的话，直接跳过就行。',
- opts:['得够像 TA，不能崩','TA 说的话我能改、能撤','只有我自己看得到，不公开',
-  '谁能见到 TA，我说了算','我想删的时候能删掉','其他'],
- other:[5]},
-
-{id:'q10',sec:'一些假想的情况',type:'single',req:true,show:own,
- title:'TA 有没有被别人（朋友、语C 搭子、团里、写手）写出过、演出过你没预料到的剧情？',
- opts:['有，我挺喜欢，收藏了 / 当成 if 线','有，我当没看见，不影响我自己的设定',
-  '有，我去跟对方沟通了','有，之后我就不太敢把设定给别人了','没发生过',
-  '我从来没把 TA 给别人看过']},
-
-{id:'q11',sec:'一些假想的情况',type:'single',req:true,
+{id:'q11',sec:'你平时用什么',type:'single',req:true,
  title:'在你常待的圈子里，提到「用 AI 参与创作」大概是什么氛围？',
  opts:['挺平常的，没什么人特别在意','有人用，但一般不会特意说','有一些争议',
   '大家普遍不太能接受','不太清楚']},
 
-// ===== 最后（2 题）=====
+// ================= 最后 =================
 {id:'q12',sec:'最后',type:'area',show:hasTA,
  title:'如果要跟一个完全不认识 TA 的人介绍 TA，你会怎么说？',
  hint:'几句话，怎么顺口怎么写。选填。',ph:'……'},
 
+{id:'qage',sec:'最后',type:'single',req:true,
+ title:'你现在是——',
+ opts:['初中及以下','高中 / 中专','大学 / 大专','已经工作了','不想说']},
+
 {id:'q13',sec:'最后',type:'text',
  title:'留个方便的联系方式吧，哪种都可以。',
- hint:'比如 QQ 号，或者邮箱，你常用的任何一个都行。不想留直接提交就好。<br>只用于之后找你聊聊 TA（半小时左右，文字聊，可以匿名），不会加你别的群，也不会发广告。',
+ hint:'比如 QQ 号，或者邮箱，你常用的任何一个都行。不想留直接提交就好。<br>只用于之后找你多聊几句（半小时左右，文字聊，可以匿名），不会加你别的群，也不会发广告。',
  ph:'写哪种都行'}
 ];
 
 function visible(q){ return !q.show || q.show(); }
-function visList(){ return Q.filter(visible); }
+// Q1 还没答时，按「有自设」这条最长路径算总数，避免答完第 1 题总数从 5 跳到 12
+function visList(){
+  if(A['q1']===undefined){
+    A['q1']=0; var r=Q.filter(visible); delete A['q1']; return r;
+  }
+  return Q.filter(visible);
+}
 function esc(s){ return String(s).replace(/[&<>"]/g,function(c){
   return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
 
@@ -221,13 +241,22 @@ var stage=document.getElementById('stage'), errEl=document.getElementById('err')
 var secEl=document.getElementById('sec'), cntEl=document.getElementById('cnt'), fillEl=document.getElementById('fill');
 var prevB=document.getElementById('prev'), nextB=document.getElementById('next');
 
-function shuffled(n){ var a=[],i,j,t; for(i=0;i<n;i++)a.push(i);
-  for(i=n-1;i>0;i--){ j=Math.floor(Math.random()*(i+1)); t=a[i];a[i]=a[j];a[j]=t; } return a; }
+// 随机排序：末项（「没特别想过」这类兜底项）固定不参与
+function orderFor(q){
+  if(!q.random){ var a=[],z; for(z=0;z<q.opts.length;z++)a.push(z); return a; }
+  if(randOrder[q.id]) return randOrder[q.id];
+  var n=q.opts.length-1, arr=[], i, j, t;
+  for(i=0;i<n;i++) arr.push(i);
+  for(i=n-1;i>0;i--){ j=Math.floor(Math.random()*(i+1)); t=arr[i];arr[i]=arr[j];arr[j]=t; }
+  arr.push(q.opts.length-1);
+  randOrder[q.id]=arr; return arr;
+}
 
 function render(){
   errEl.textContent=pendErr; pendErr='';
   if(ended){ renderEnd(); return; }
   var q=Q[cur], vl=visList(), pos=vl.indexOf(q)+1, tot=vl.length;
+  if(pos<1){ pos=1; }
   secEl.textContent=q.sec;
   cntEl.textContent=pos+' / '+tot;
   fillEl.style.width=(pos/tot*100)+'%';
@@ -242,11 +271,8 @@ function render(){
   if(q.mnote) h+='<p class="mnote">'+esc(q.mnote)+'</p>';
 
   if(q.type==='single'||q.type==='multi'){
-    var order;
-    if(q.random){ if(!q4order) q4order=shuffled(q.opts.length); order=q4order; }
-    else { order=[]; for(var z=0;z<q.opts.length;z++) order.push(z); }
     h+='<ul class="opts">';
-    order.forEach(function(i){
+    orderFor(q).forEach(function(i){
       var sel = q.type==='single' ? A[q.id]===i : has(q.id,i);
       h+='<li><label class="o'+(sel?' sel':'')+'" data-i="'+i+'">'+
         '<input type="'+(q.type==='single'?'radio':'checkbox')+'" '+(sel?'checked':'')+
@@ -295,11 +321,19 @@ function bind(q){
       l.addEventListener('click',function(e){
         e.preventDefault();
         var i=+l.getAttribute('data-i');
-        if(q.type==='single'){ A[q.id]=i; }
-        else{
+        if(q.type==='single'){
+          A[q.id]=i;
+          if(q.id==='q1') clearBranch();
+        } else {
           var v=A[q.id]||[], at=v.indexOf(i), isE = q.excl && q.excl.indexOf(i)>=0;
-          if(at>=0){ v.splice(at,1); }
-          else if(isE){ v=[i]; }
+          if(at>=0){
+            v.splice(at,1);
+            if(q.other && q.other.indexOf(i)>=0) delete A[q.id+'_other']; // 取消勾选就清掉填的字
+          }
+          else if(isE){
+            v=[i];
+            if(q.other) q.other.forEach(function(o){ delete A[q.id+'_other']; });
+          }
           else{
             if(q.excl) v=v.filter(function(x){return q.excl.indexOf(x)<0});
             if(q.lim && v.length>=q.lim){
@@ -308,6 +342,7 @@ function bind(q){
             v.push(i);
           }
           A[q.id]=v;
+          if(q.id==='q5') { delete A['q6']; }   // 改了工具清单，Q6 的旧答案作废
         }
         render();
       });
@@ -335,7 +370,23 @@ function bind(q){
   }
 }
 
+// 改了 Q1 就清掉所有分支专属的旧答案，防止残留混进导出
+function clearBranch(){
+  ['b1','b2','q2','q3','q7','q8','q10','q4','q12','q1name'].forEach(function(k){
+    var q=null; for(var i=0;i<Q.length;i++) if(Q[i].id===k) q=Q[i];
+    if(q && !visible(q)){ delete A[k]; delete A[k+'_other']; }
+  });
+  if(!hasTA()) delete A['q1name'];
+}
+
 function validate(q){
+  // 「其他」勾了但没填字
+  if(q.other && A[q.id]){
+    var picked = (q.type==='multi') ? A[q.id] : [A[q.id]];
+    for(var k=0;k<q.other.length;k++)
+      if(picked.indexOf(q.other[k])>=0 && !(A[q.id+'_other']||'').replace(/\s/g,''))
+        return '「其他」那一项要填一下才能继续。';
+  }
   if(!q.req) return null;
   var v=A[q.id];
   if(q.type==='single') return (v===undefined)?'选一个再往下吧。':null;
@@ -348,7 +399,7 @@ function validate(q){
       miss++; var el=stage.querySelector('[data-row="'+i+'"]');
       if(el&&el.classList) el.classList.add('miss');
     }
-    if(miss) return '还有 '+miss+' 行没选。';
+    if(miss) return '还有 '+miss+' 行没选，标红的那几行往上翻一下。';
   }
   return null;
 }
@@ -369,7 +420,7 @@ function renderEnd(){
     try{ document.execCommand('copy'); this.textContent='已复制'; }catch(e){ this.textContent='复制失败'; }
     document.body.removeChild(ta); };
   document.getElementById('again').onclick=function(){
-    A={}; histIdx=[]; cur=0; ended=false; q4order=null; nextB.hidden=false; render(); };
+    A={}; histIdx=[]; cur=0; ended=false; randOrder={}; nextB.hidden=false; render(); };
 }
 
 function dump(){
@@ -382,7 +433,10 @@ function dump(){
     else if(q.type==='multi') s=v.map(function(i){return q.opts[i]}).join(' / ');
     else if(q.type==='matrix') s=q.rows.map(function(r,i){return r.k+'='+(q.cols[v[i]]||'—')}).join('　');
     else s=v;
-    if(A[q.id+'_other']) s+='（其他：'+A[q.id+'_other']+'）';
+    // 只有真的勾了带填空的选项，才拼「其他」
+    if(A[q.id+'_other'] && q.other && Array.isArray(A[q.id]))
+      for(var k=0;k<q.other.length;k++)
+        if(A[q.id].indexOf(q.other[k])>=0){ s+='（其他：'+A[q.id+'_other']+'）'; break; }
     out.push(q.id+'　'+s);
     if(q.extra && A[q.extra.id]) out.push(q.extra.id+'　'+A[q.extra.id]);
   });
