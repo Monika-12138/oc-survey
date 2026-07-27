@@ -21,13 +21,11 @@ body{margin:0;background:var(--bg);color:var(--ink);
   padding:9px 14px;font-size:12.5px;text-align:center}
 .banner b{font-weight:600}
 .wrap{max-width:600px;margin:0 auto;padding:0 18px 60px}
-
 .hd{display:flex;justify-content:space-between;align-items:baseline;
   font-size:12px;color:var(--sub);letter-spacing:1px;margin:22px 0 8px}
 .hd .sec{color:var(--accent);font-weight:600;letter-spacing:1.5px}
 .bar{height:3px;background:var(--line);border-radius:2px;overflow:hidden;margin-bottom:28px}
 .bar i{display:block;height:100%;background:var(--accent);width:0;transition:width .3s cubic-bezier(.4,0,.2,1)}
-
 .qt{font-size:19px;line-height:1.6;font-weight:500;margin:0}
 .req{color:var(--accent);margin-left:4px}
 .tag{display:inline-block;font-size:11px;color:var(--sub);border:1px solid var(--line);
@@ -35,22 +33,21 @@ body{margin:0;background:var(--bg);color:var(--ink);
 .hint{font-size:13.5px;color:var(--sub);margin:9px 0 0;line-height:1.75}
 .note{background:var(--soft);border-radius:9px;padding:13px 15px;
   font-size:13.5px;color:var(--sub);line-height:1.75;margin:0 0 22px}
-
+.mnote{font-size:13px;color:var(--sub);line-height:1.7;margin:14px 0 0}
 .opts{margin:22px 0 0;padding:0;list-style:none}
 label.o{display:flex;gap:11px;align-items:flex-start;padding:12px 13px;border-radius:9px;
   cursor:pointer;font-size:15px;line-height:1.6;border:1px solid transparent;transition:.12s}
 label.o:hover{background:var(--soft)}
 label.o.sel{background:var(--soft);border-color:var(--accent)}
-label.o.off{opacity:.38}
 label.o input{margin:5px 0 0;accent-color:var(--accent);flex:none;width:17px;height:17px}
 .otherbox{margin:6px 0 0 41px;width:calc(100% - 41px)}
-
 input[type=text],textarea{width:100%;background:var(--card);border:1px solid var(--line);
   border-radius:9px;padding:12px 14px;color:var(--ink);font:inherit;font-size:15px;resize:vertical}
-#stage>.qbody input[type=text],#stage>.qbody textarea{margin-top:22px}
+.qbody>input[type=text],.qbody>textarea{margin-top:22px}
 input[type=text]:focus,textarea:focus{outline:none;border-color:var(--accent)}
-
-.grp{font-size:12.5px;color:var(--accent);margin:24px 0 8px;font-weight:600;letter-spacing:.5px}
+.extra{margin-top:24px;padding-top:20px;border-top:1px dashed var(--line)}
+.extra p{font-size:13.5px;color:var(--sub);margin:0 0 10px;line-height:1.7}
+.grp{font-size:12.5px;color:var(--accent);margin:22px 0 8px;font-weight:600;letter-spacing:.5px}
 .row{border:1px solid var(--line);border-radius:10px;padding:13px 14px;margin-bottom:10px;background:var(--card)}
 .row.miss{border-color:var(--err)}
 .rowt{font-size:14.5px;line-height:1.6;margin-bottom:11px}
@@ -62,7 +59,6 @@ input[type=text]:focus,textarea:focus{outline:none;border-color:var(--accent)}
 .scale label:hover{background:var(--soft)}
 .scale label.sel{background:var(--soft);border-color:var(--accent);color:var(--ink)}
 .scale input{accent-color:var(--accent);width:16px;height:16px;margin:0}
-
 .err{color:var(--err);font-size:13.5px;margin-top:16px;min-height:20px}
 .nav{display:flex;gap:10px;margin-top:30px;padding-top:20px;border-top:1px solid var(--line)}
 button{font:inherit;font-size:15px;border-radius:9px;padding:13px 22px;cursor:pointer;
@@ -71,7 +67,6 @@ button:hover{border-color:var(--accent);color:var(--accent)}
 #next{flex:1;background:var(--accent);border-color:var(--accent);color:#fff;font-weight:500}
 #next:hover{opacity:.88;color:#fff}
 button[hidden]{display:none}
-
 .done{text-align:center;padding:54px 6px 14px}
 .done .big{font-size:21px;font-weight:500;margin-bottom:14px}
 .done p{color:var(--sub);font-size:14.5px;margin:0 0 8px}
@@ -84,7 +79,7 @@ pre{background:var(--card);border:1px solid var(--line);border-radius:9px;paddin
 </style>
 </head>
 <body>
-<div class="banner">📄 <b>样稿</b>　可以随便点，不会真的提交。第 1 题选不同答案，后面走的题目也不一样</div>
+<div class="banner">📄 <b>样稿</b>　可以随便点，不会真的提交。第 1 题选不同答案，后面走的题也不一样</div>
 <div class="wrap">
   <div class="hd"><span class="sec" id="sec"></span><span id="cnt"></span></div>
   <div class="bar"><i id="fill"></i></div>
@@ -100,50 +95,36 @@ pre{background:var(--card);border:1px solid var(--line);border-radius:9px;paddin
 (function(){
 "use strict";
 
-var A = {};              // 答案
-var histIdx = [];        // 走过的题（用于上一题）
-var cur = 0;             // 当前在 Q 中的下标
-var ended = null;        // 'A' | 'B'
-var q8order = null;
+var A = {}, histIdx = [], cur = 0, ended = false, q4order = null, pendErr = '';
 
-function has(id, i){ var v=A[id]; return Array.isArray(v) && v.indexOf(i)>=0; }
-function is(id, i){ return A[id]===i; }
+function has(id,i){ var v=A[id]; return Array.isArray(v) && v.indexOf(i)>=0; }
 // 三种人群，由 Q1 分流
-var own  = function(){ var v=A['q1']; return v===0||v===1||v===2; }; // 有自设
-var fav  = function(){ return A['q1']===3; };                        // 没自设，但有本命
-var none = function(){ return A['q1']===4; };                        // 都没有
-var hasTA= function(){ return own()||fav(); };                       // 有一个「TA」可以指
+var own  = function(){ var v=A['q1']; return v===0||v===1||v===2; };  // 有自设
+var fav  = function(){ return A['q1']===3; };                         // 没自设，但有本命
+var none = function(){ return A['q1']===4; };                         // 都没有
+var hasTA= function(){ return own()||fav(); };                        // 有一个「TA」可以指
 
 var Q = [
+
+// ===== 开头 =====
 {id:'q1',sec:'你和你的角色',type:'single',req:true,
  title:'你有自己的自设（OC）吗？',
- opts:['有，1 个','有，2–5 个','有，6 个以上','没有自设，但有特别喜欢的角色（本命 / 官方角色）','都没有']},
+ opts:['有，1 个','有，2–5 个','有，6 个以上',
+       '没有自设，但有特别喜欢的角色（本命 / 官方角色）','都没有'],
+ extra:{id:'q1name',when:hasTA,ph:'TA 的名字或代号，写个昵称也行',
+        label:'挑一个你最放在心上的，写下 TA 的名字或代号——后面的题都只针对 TA。'}},
 
-// ---- 「都没有」的短分支：b1–b4，答完直接接回 Q9 ----
-{id:'b1',sec:'关于「自己的角色」',type:'multi',req:true,show:none,
- title:'没有自设，主要是因为？',
- opts:['没特别想过','想过，但不知道从哪儿开始','想过，但要定的东西太多',
-  '不太会画，也没找人画过','以前有过，现在不太玩了',
-  '更喜欢现成的角色，不太需要自己造一个','就是没什么兴趣','其他'],
- other:[7]},
-
-{id:'b2',sec:'关于「自己的角色」',type:'single',req:true,show:none,
- title:'你有没有过「想有一个属于自己的角色」的念头？',
+// ===== 「都没有」的短分支 =====
+{id:'b1',sec:'关于「自己的角色」',type:'single',req:true,show:none,
+ title:'你有没有想过要一个属于自己的角色？',
  opts:['一直想，但没真的动手','试过，没弄成','偶尔会想想','没有过']},
 
-{id:'b3',sec:'关于「自己的角色」',type:'single',req:true,show:none,
- title:'如果有个东西，你只要跟它聊聊天，它就能帮你把一个角色慢慢弄出来（性格、故事这些都不用自己憋），你会想试试吗？',
+{id:'b2',sec:'关于「自己的角色」',type:'single',req:true,show:none,
+ title:'如果有个东西能陪你把一个角色慢慢弄出来，还能跟你说说话，你会想试试吗？',
  opts:['挺想试的','有点兴趣，看效果','说不好','不太想','完全不想']},
 
-{id:'b4',sec:'关于「自己的角色」',type:'single',req:true,show:none,
- title:'如果真有这么一个角色被你弄出来了，你最想让 TA 做什么？',
- opts:['能跟我说说话','有一个属于 TA 的故事','就是有个形象、有个设定，摆着就行','说不好']},
-
-{id:'q2',sec:'你和你的角色',type:'text',req:true,max:20,show:hasTA,
- title:'如果你有不止一个，挑一个你最放在心上的，写下 TA 的名字或代号就行。',
- hint:'后面的题目，都只针对这一个角色。',ph:'名字或代号'},
-
-{id:'q3',sec:'你和你的角色',type:'multi',req:true,show:own,
+// ===== 了解 OC（3 题）=====
+{id:'q2',sec:'你和你的角色',type:'multi',req:true,show:own,
  title:'关于 TA，下面这些你心里已经有答案的有哪些？',
  hint:'想到就算，不用写下来。',
  opts:['性格、行为逻辑','说话方式、口癖、自称','背景故事、前史','和其他角色的关系',
@@ -151,147 +132,97 @@ var Q = [
   '服装 / 武器 / 随身的东西','声音（音色、声优想象）','都还没怎么定，TA 还在慢慢长'],
  excl:[10]},
 
-{id:'q4',sec:'你和你的角色',type:'single',req:true,show:own,
- title:'这些设定，你有写下来吗？',
- opts:['有比较完整的设定文档','有一些零散的笔记','基本都在心里，没特意写过']},
-
-{id:'q5',sec:'你和你的角色',type:'area',show:hasTA,
- title:'如果要跟一个完全不认识 TA 的人安利 TA，你会怎么说？',
- hint:'怎么顺口怎么写，几句话就行。选填。',ph:'……'},
-
-{id:'q6',sec:'你平时都拿 TA 做什么',type:'multi',req:true,show:hasTA,
- title:'下面这些事，你为 TA 做过哪些？',
- opts:['写文（同人文 / 小说 / 日记体）','写设定集','语C、扮演 TA 跟别人互动','跑团带 TA 上场',
-  '让朋友帮忙扮演 TA、跟你对戏','给 TA 做过角色卡 / 设定卡','找画师约稿 / 自己画图',
+{id:'q3',sec:'你和你的角色',type:'multi',req:true,show:hasTA,
+ title:'你平时都为 TA 做过些什么？',
+ opts:['写文（同人文 / 小说 / 日记体）','写设定集','语C、跟人对戏','跑团带 TA 上场',
+  '让朋友帮忙演 TA、跟你对戏','给 TA 做过角色卡 / 设定卡','找画师约稿 / 自己画图',
   '给 TA 过生日、约生贺图 / 写生贺文','给 TA 配音 / 找声音素材','做 PV、MAD、动态图',
   '做 3D 模型 / MMD / VRChat','做周边、印本、表情包','其他',
   '以上都还没做过，TA 主要活在我自己心里'],
  excl:[13],other:[12]},
 
-{id:'q7',sec:'你平时都拿 TA 做什么',type:'single',req:true,show:own,
- title:'「别人来扮演你的 OC」这件事，你的感觉更接近哪一条？',
- opts:['乐意，希望 TA 被更多人演','可以，前提是我先给设定 / 我认可这个人','只接受关系很近的朋友',
-  '更愿意 TA 只由我来演','完全不接受']},
+{id:'q4',sec:'你和你的角色',type:'multi',req:true,lim:3,random:true,show:hasTA,
+ title:'如果想让 TA 更「活」一点，你会想用什么方式？',
+ hint:'最多选 3 个。',
+ opts:['自己写文，把 TA 写进故事里','找画师约稿 / 自己画','语C、跟人对戏',
+  '跑团带 TA 上场','做动画 / PV / 动态漫','找人帮 TA 配音','让 AI 帮忙',
+  '没特别想过']},
 
-{id:'q8',sec:'你平时都拿 TA 做什么',type:'single',req:true,random:true,show:hasTA,
- title:'如果能给 TA 多一件事，你最想要哪个？',
- opts:['有更多的图','有人陪 TA 演对手戏','有一个完整的故事，能走到结局','能开口跟我说话',
-  '有声音','被更多人看到、喜欢','有稳定的同好一起聊 TA','目前挺好的，没有特别想要的']},
+// ===== 你平时用什么（2 题）=====
+{id:'q5',sec:'你平时用什么',type:'multi',req:true,
+ title:'下面这些，你碰过哪些？',
+ hint:'用过、试过、随便玩过都算。',
+ opts:['找参考图、素材图库','AI 聊天（DeepSeek / 豆包 那种）',
+  '玩过别人做好的 AI 角色（猫箱、C.AI 那种）','自己在 AI 里建过角色',
+  '把自己写的设定粘给 AI，让它照着说','酒馆（SillyTavern）那类自己折腾的',
+  '让 AI 写过东西、续写过','语音合成、配音工具',
+  '没自己碰过，但身边有人在用','都没碰过'],
+ excl:[8,9]},
 
-{id:'q9',sec:'关于 AI',type:'multi',req:true,
- title:'下面这些，你自己用过哪些？',
- opts:['通用 AI 聊天（DeepSeek / 豆包 / Kimi / 元宝 / ChatGPT 等）',
-  'AI 角色扮演 App，玩别人做好的角色（猫箱 / 星野 / 筑梦岛 / Talkie / C.AI 等）',
-  'AI 角色扮演 App，自己建过角色',
-  '把自己写的设定直接粘进通用 AI，让它照着演',
-  '酒馆（SillyTavern）或自己配 API 跑的',
-  'AI 写作、续写','AI 配音 / 语音合成',
-  '没自己用过，但见别人用过','都没用过'],
- excl:[7,8]},
+{id:'q6',sec:'你平时用什么',type:'single',req:true,
+ title:'那类「能跟角色说话」的东西，你后来还在用吗？',
+ opts:['一直在用','用过一阵，后来淡了——说话不太像那个角色',
+  '用过一阵，后来淡了——记不住之前发生的事','用过一阵，后来淡了——没什么新鲜感了',
+  '用过一阵，后来淡了——别的原因','没碰过这类东西']},
 
-{id:'q10',sec:'关于 AI',type:'single',req:true,
- show:function(){return has('q9',2)||has('q9',3)},
- title:'你放进去的角色里，有你自己的 OC 吗？',
- opts:['有，就是我主力 OC','有，但只放了简化版的设定','没有，用的都是现成作品里的角色','不太记得了']},
+// ===== 一些假想的情况（5 题）=====
+{id:'q7',sec:'一些假想的情况',type:'matrix',req:true,show:hasTA,
+ note:'下面几题说的是一些假想的情况，现实里不一定有。只想知道你的第一反应，不用管现在能不能做到。觉得「完全不行」也是一种答案，和选别的一样有用。',
+ title:'假设有个办法能让 TA 开口，下面每种情况你觉得怎么样？',
+ mnote:'先别管靠什么办法——自己找人、用工具，都算。只看这件事本身你接不接受。',
+ cols:['愿意试试','有条件可以','不太愿意','完全不行'],
+ rows:[
+  {g:'TA 能走到哪一步 · 下面几行都只有你自己看得到',k:'A',t:'TA 能跟你一来一回地说话'},
+  {k:'B',t:'TA 会自己拿主意，把剧情往下推'},
+  {k:'C',t:'同一场戏里还有别的角色在，跟 TA 有来有往'},
+  {g:'谁能跟 TA 说上话 · 下面几行都假设 TA 已经能开口',k:'D',t:'只有你自己'},
+  {k:'E',t:'你指定的朋友也能跟 TA 说说话'},
+  {k:'F',t:'任何人都能跟 TA 说说话'},
+  {g:'单独一行',k:'G',t:'TA 和别人的角色，在同一个故事里对戏'}]},
 
-{id:'q11',sec:'关于 AI',type:'single',
- show:function(){return has('q9',1)||has('q9',2)||has('q9',4)},
- title:'上一次用这类工具，后来为什么不太用了？',
+{id:'q8',sec:'一些假想的情况',type:'multi',show:function(){
+  var v=A['q7']; if(!v) return false;
+  for(var i=0;i<v.length;i++) if(v[i]===1) return true; return false; },
+ title:'上一题里你觉得「有条件可以」的，条件主要是什么？',
  hint:'选填。',
- opts:['说话不像那个角色','记不住之前发生的事','收费 / 额度不够','内容限制比较多',
-  '玩过一阵，没什么新东西了','一直在用，没停','其他'],
+ opts:['设定不会被拿去训练模型','我能随时删掉 TA、删掉记录','TA 说的话我能改、能撤',
+  '只有我自己看得到，不公开','谁能见到 TA，我说了算','得够像 TA，不能崩','其他'],
  other:[6]},
 
-{id:'q12',sec:'关于 AI',type:'single',req:true,
- title:'在你常待的圈子里，提到 AI 大概是什么氛围？',
+{id:'q9',sec:'一些假想的情况',type:'multi',req:true,lim:3,show:hasTA,
+ title:'什么情况下，你会觉得「这不是 TA 了」？',
+ hint:'最多选 3 个。',
+ opts:['自称、口癖、说话腔调不对','性格反了','说出违背 TA 底线的话','记错了设定',
+  '忘了之前发生的事','说话太客气、太套路，没有 TA 的味道',
+  '一味顺着我说，没有自己的立场','剧情推得莫名其妙']},
+
+{id:'q10',sec:'一些假想的情况',type:'single',req:true,show:own,
+ title:'TA 有没有被别人（朋友、语C 搭子、团里、写手）写出过、演出过你没预料到的剧情？',
+ opts:['有，我挺喜欢，收藏了 / 当成 if 线','有，我当没看见，不影响我自己的设定',
+  '有，我去跟对方沟通了','有，之后我就不太敢把设定给别人了','没发生过',
+  '我从来没把 TA 给别人看过']},
+
+{id:'q11',sec:'一些假想的情况',type:'single',req:true,
+ title:'在你常待的圈子里，提到「用 AI 参与创作」大概是什么氛围？',
  opts:['挺平常的，没什么人特别在意','有人用，但一般不会特意说','有一些争议',
   '大家普遍不太能接受','不太清楚']},
 
-{id:'q13',sec:'如果 AI 来演 TA',type:'single',req:true,show:hasTA,
- note:'下面几题说的是一些假想的情况，现实里不一定存在。只想知道你的第一反应，不用考虑技术上现在能不能做到。选「完全不行」和选别的一样有用。',
- title:'「有一个 AI，读完 TA 的设定之后，用 TA 的口吻跟你说话」——你现在的状态是？',
- opts:['已经这么玩过，效果不错，现在还在玩','已经这么玩过，效果不太行，后来没继续',
-  '玩过 AI 演角色，但没舍得用自己的角色，用的是现成角色','没试过，想试试','没试过，也不太想']},
+// ===== 最后（2 题）=====
+{id:'q12',sec:'最后',type:'area',show:hasTA,
+ title:'如果要跟一个完全不认识 TA 的人介绍 TA，你会怎么说？',
+ hint:'几句话，怎么顺口怎么写。选填。',ph:'……'},
 
-{id:'q14',sec:'如果 AI 来演 TA',type:'matrix',req:true,show:hasTA,
- title:'下面每种情况，你的态度是？',
- cols:['愿意试试','有条件可以','不太愿意','完全不行'],
- rows:[
-  {g:'由谁来演 · 下面几行都假设只有你自己看得到',k:'A',t:'你自己演 TA，AI 只演对手戏里的其他角色'},
-  {k:'B',t:'AI 照你给的设定，用 TA 的口吻跟你说话，你说一句 TA 答一句'},
-  {k:'C',t:'在 B 的基础上，TA 会自己做决定、自己推着剧情往下走'},
-  {k:'D',t:'在 C 的基础上，AI 同时演 TA 和另外几个角色，演一整场群像戏'},
-  {g:'谁能接触到 TA · 下面几行都假设是 AI 用 TA 的口吻说话',k:'E',t:'只有你自己'},
-  {k:'F',t:'你指定的朋友可以跟 TA 对话'},
-  {k:'G',t:'任何陌生人都可以跟 TA 对话'},
-  {g:'单独一行',k:'H',t:'你和另一个人各自的角色，在同一个故事里互相演对手戏'}]},
-
-{id:'q15',sec:'如果 AI 来演 TA',type:'multi',
- show:function(){var v=A['q14']; if(!v) return false;
-   for(var i=0;i<v.length;i++) if(v[i]===1) return true; return false;},
- title:'上一题里，选了「有条件可以」的，主要是什么条件？',
- hint:'选填。',
- opts:['设定不会被拿去训练模型','我能随时删掉 TA、删掉记录','我能审核、修改 TA 说过的话',
-  '只有我自己看得到，不公开','由我决定谁能接触 TA','效果得够好，不崩人设','其他'],
- other:[6]},
-
-{id:'q16',sec:'如果 AI 来演 TA',type:'single',req:true,show:own,
- title:'TA 有没有被别人（朋友、语C 搭子、团里、同人写手）写出过、演出过你没预料到的剧情？',
- opts:['有，我挺喜欢，收藏了 / 当成 if 线','有，我当没看见，不影响我自己的设定',
-  '有，我去跟对方沟通了','有，之后我就不太敢把设定给别人了','没发生过','我从来没把 TA 给别人看过']},
-
-{id:'q17',sec:'如果 AI 来演 TA',type:'multi',req:true,lim:3,show:hasTA,
- title:'下面哪些会让你直接不用？',
- hint:'挑你最介意的，最多选 3 个。',
- opts:['说话不像 TA、不符合设定','设定被拿去训练 AI 模型','TA 被别人拿去用，我不知情',
-  '设定被公开，我不想给人看','哪天产品说没就没，角色和记录一起没了',
-  '设定和聊天记录导不出来、带不走','说话太「AI 味」、太官方','模型一更新，TA 就变了个人',
-  '记不住之前发生的事','想写的内容写不了','要花钱','出结果太慢','圈子里对这个有看法',
-  '说不上来，就是别扭','其他','以上都不会'],
- excl:[15],other:[14]},
-
-{id:'q18',sec:'你会在意什么',type:'multi',req:true,lim:3,show:hasTA,
- title:'如果 TA 真的能开口，下面哪些你会最在意？',
- hint:'最多选 3 个。',
- opts:['说话的调子一直是 TA，不会聊着聊着变成别人','记得住之前聊过的事、上次到哪儿了',
-  '不止 TA 一个，别的角色也在场、会互相搭话','不用先写几千字设定，边聊边把 TA 补出来',
-  '有头有尾，能走到一个结局','TA 偶尔会主动来找我','聊完能留下点能存下来、发出去的东西',
-  '能和别人家的孩子碰面','记录能导出带走，也能随时彻底删干净','都不太打动我'],
- excl:[9]},
-
-{id:'q19',sec:'你会在意什么',type:'single',req:true,show:hasTA,
- title:'你更想要哪种？',
- opts:['就想跟 TA 说说话','想让 TA 经历一个完整的故事、有结局','两个都想要','都不太想']},
-
-{id:'q20',sec:'你会在意什么',type:'multi',req:true,
- show:function(){return has('q9',2)||has('q9',3)||has('q9',4)},
- title:'如果你在别的 AI 里建过角色，下面这些事遇到过吗？',
- opts:['我建的角色因为平台功能下线、关停，用不了了','角色或聊天记录被清空过',
-  '截图、复制粘贴备份过和角色的聊天记录','换过平台，把设定重新填了一遍',
-  '搬过去之后，感觉不是原来那个了','备份还留着，但还没找到地方继续',
-  '听说过这些事，但没轮到我','没在别的 AI 里建过角色'],
- excl:[7]},
-
-{id:'q21',sec:'最后',type:'single',
- title:'如果之后想请你多讲讲 TA（一次半小时左右，文字聊就行，可以匿名），可以联系你吗？',
- hint:'选填。',
- opts:['可以，留个联系方式','可以，但只接受文字，不要语音 / 视频',
-  '想看这次的汇总结果，可以留个联系方式','不用了']},
-
-{id:'q22',sec:'最后',type:'text',
- show:function(){return A['q21']!==undefined && A['q21']!==3},
- title:'留一个你方便的联系方式就行，哪种都可以。',
- hint:'比如 QQ 号，或者邮箱，你常用的任何一个都行。选填。<br>只用于这一件事，不会加你别的群，也不会发广告，更不会和你的答案一起对外展示。',
+{id:'q13',sec:'最后',type:'text',
+ title:'留个方便的联系方式吧，哪种都可以。',
+ hint:'比如 QQ 号，或者邮箱，你常用的任何一个都行。不想留直接提交就好。<br>只用于之后找你聊聊 TA（半小时左右，文字聊，可以匿名），不会加你别的群，也不会发广告，更不会和你的答案一起对外展示。',
  ph:'写哪种都行'}
 ];
 
-var byId={}; Q.forEach(function(q){byId[q.id]=q});
-
 function visible(q){ return !q.show || q.show(); }
 function visList(){ return Q.filter(visible); }
-function esc(s){ return String(s).replace(/[&<>]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c]}); }
+function esc(s){ return String(s).replace(/[&<>"]/g,function(c){
+  return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
 
-// ---------- 渲染 ----------
 var stage=document.getElementById('stage'), errEl=document.getElementById('err');
 var secEl=document.getElementById('sec'), cntEl=document.getElementById('cnt'), fillEl=document.getElementById('fill');
 var prevB=document.getElementById('prev'), nextB=document.getElementById('next');
@@ -299,12 +230,10 @@ var prevB=document.getElementById('prev'), nextB=document.getElementById('next')
 function shuffled(n){ var a=[],i,j,t; for(i=0;i<n;i++)a.push(i);
   for(i=n-1;i>0;i--){ j=Math.floor(Math.random()*(i+1)); t=a[i];a[i]=a[j];a[j]=t; } return a; }
 
-var pendErr='';
 function render(){
   errEl.textContent=pendErr; pendErr='';
   if(ended){ renderEnd(); return; }
-  var q=Q[cur];
-  var vl=visList(), pos=vl.indexOf(q)+1, tot=vl.length;
+  var q=Q[cur], vl=visList(), pos=vl.indexOf(q)+1, tot=vl.length;
   secEl.textContent=q.sec;
   cntEl.textContent=pos+' / '+tot;
   fillEl.style.width=(pos/tot*100)+'%';
@@ -316,10 +245,11 @@ function render(){
   if(q.lim) h+='<span class="tag">最多 '+q.lim+' 项</span>';
   h+='</h2>';
   if(q.hint) h+='<p class="hint">'+q.hint+'</p>';
+  if(q.mnote) h+='<p class="mnote">'+esc(q.mnote)+'</p>';
 
   if(q.type==='single'||q.type==='multi'){
     var order;
-    if(q.random){ if(!q8order) q8order=shuffled(q.opts.length); order=q8order; }
+    if(q.random){ if(!q4order) q4order=shuffled(q.opts.length); order=q4order; }
     else { order=[]; for(var z=0;z<q.opts.length;z++) order.push(z); }
     h+='<ul class="opts">';
     order.forEach(function(i){
@@ -328,18 +258,22 @@ function render(){
         '<input type="'+(q.type==='single'?'radio':'checkbox')+'" '+(sel?'checked':'')+
         ' name="'+q.id+'">'+esc(q.opts[i])+'</label>';
       if(q.other&&q.other.indexOf(i)>=0&&sel)
-        h+='<input class="otherbox" type="text" data-other="'+i+'" placeholder="请填写" value="'+
+        h+='<input class="otherbox" type="text" data-other="1" placeholder="请填写" value="'+
           esc(A[q.id+'_other']||'')+'">';
       h+='</li>';
     });
     h+='</ul>';
+    if(q.extra && q.extra.when()){
+      h+='<div class="extra"><p>'+esc(q.extra.label)+'</p>'+
+         '<input type="text" data-extra="1" maxlength="20" placeholder="'+esc(q.extra.ph)+
+         '" value="'+esc(A[q.extra.id]||'')+'"></div>';
+    }
   }
   else if(q.type==='text'){
-    h+='<input type="text" data-in placeholder="'+esc(q.ph||'')+'" value="'+esc(A[q.id]||'')+'"'+
-       (q.max?' maxlength="'+q.max+'"':'')+'>';
+    h+='<input type="text" data-in="1" placeholder="'+esc(q.ph||'')+'" value="'+esc(A[q.id]||'')+'">';
   }
   else if(q.type==='area'){
-    h+='<textarea data-in rows="4" placeholder="'+esc(q.ph||'')+'">'+esc(A[q.id]||'')+'</textarea>';
+    h+='<textarea data-in="1" rows="4" placeholder="'+esc(q.ph||'')+'">'+esc(A[q.id]||'')+'</textarea>';
   }
   else if(q.type==='matrix'){
     var v=A[q.id]||[];
@@ -347,9 +281,8 @@ function render(){
       if(r.g) h+='<div class="grp">'+esc(r.g)+'</div>';
       h+='<div class="row" data-row="'+ri+'"><div class="rowt"><b>'+r.k+'</b>'+esc(r.t)+'</div><div class="scale">';
       q.cols.forEach(function(c,ci){
-        var sel=v[ri]===ci;
-        h+='<label class="'+(sel?'sel':'')+'" data-row="'+ri+'" data-col="'+ci+'">'+
-          '<input type="radio" name="'+q.id+'_'+ri+'" '+(sel?'checked':'')+'>'+esc(c)+'</label>';
+        h+='<label class="'+(v[ri]===ci?'sel':'')+'" data-row="'+ri+'" data-col="'+ci+'">'+
+          '<input type="radio" name="'+q.id+'_'+ri+'" '+(v[ri]===ci?'checked':'')+'>'+esc(c)+'</label>';
       });
       h+='</div></div>';
     });
@@ -357,7 +290,6 @@ function render(){
   h+='</div>';
   stage.innerHTML=h;
   bind(q);
-
   prevB.hidden = histIdx.length===0;
   nextB.textContent = (pos===tot) ? '提交' : '下一题';
   window.scrollTo(0,0);
@@ -367,23 +299,19 @@ function bind(q){
   if(q.type==='single'||q.type==='multi'){
     [].forEach.call(stage.querySelectorAll('label.o'),function(l){
       l.addEventListener('click',function(e){
-        if(e.target.tagName==='INPUT'&&e.target.type==='text') return;
         e.preventDefault();
         var i=+l.getAttribute('data-i');
         if(q.type==='single'){ A[q.id]=i; }
         else{
-          var v=A[q.id]||[]; var at=v.indexOf(i);
-          var isExcl = q.excl && q.excl.indexOf(i)>=0;
+          var v=A[q.id]||[], at=v.indexOf(i), isE = q.excl && q.excl.indexOf(i)>=0;
           if(at>=0){ v.splice(at,1); }
+          else if(isE){ v=[i]; }
           else{
-            if(isExcl){ v=[i]; }
-            else{
-              if(q.excl) v=v.filter(function(x){return q.excl.indexOf(x)<0});
-              if(q.lim && v.length>=q.lim){
-                pendErr='最多选 '+q.lim+' 个，想换的话先取消一个。'; render(); return;
-              }
-              v.push(i);
+            if(q.excl) v=v.filter(function(x){return q.excl.indexOf(x)<0});
+            if(q.lim && v.length>=q.lim){
+              pendErr='最多选 '+q.lim+' 个，想换的话先取消一个。'; render(); return;
             }
+            v.push(i);
           }
           A[q.id]=v;
         }
@@ -394,6 +322,8 @@ function bind(q){
       inp.addEventListener('input',function(){ A[q.id+'_other']=inp.value; });
       inp.addEventListener('click',function(e){ e.stopPropagation(); });
     });
+    var ex=stage.querySelector('[data-extra]');
+    if(ex) ex.addEventListener('input',function(){ A[q.extra.id]=ex.value; });
   }
   else if(q.type==='text'||q.type==='area'){
     var el=stage.querySelector('[data-in]');
@@ -404,8 +334,8 @@ function bind(q){
     [].forEach.call(stage.querySelectorAll('.scale label'),function(l){
       l.addEventListener('click',function(e){
         e.preventDefault();
-        var ri=+l.getAttribute('data-row'), ci=+l.getAttribute('data-col');
-        var v=A[q.id]||[]; v[ri]=ci; A[q.id]=v; render();
+        var v=A[q.id]||[]; v[+l.getAttribute('data-row')]=+l.getAttribute('data-col');
+        A[q.id]=v; render();
       });
     });
   }
@@ -416,75 +346,70 @@ function validate(q){
   var v=A[q.id];
   if(q.type==='single') return (v===undefined)?'选一个再往下吧。':null;
   if(q.type==='multi')  return (!v||!v.length)?'至少选一个再往下吧。':null;
-  if(q.type==='text')   return (!v||!v.trim())?'这题要填一下才能继续。':null;
+  if(q.type==='text'||q.type==='area') return (!v||!v.replace(/\s/g,''))?'这题要填一下才能继续。':null;
   if(q.type==='matrix'){
     if(!v) return '每一行都选一个再往下吧。';
+    var miss=0;
     for(var i=0;i<q.rows.length;i++) if(v[i]===undefined){
-      var el=stage.querySelector('[data-row="'+i+'"]');
+      miss++; var el=stage.querySelector('[data-row="'+i+'"]');
       if(el&&el.classList) el.classList.add('miss');
-      return '还有 '+q.rows.filter(function(_,k){return v[k]===undefined}).length+' 行没选。';
     }
+    if(miss) return '还有 '+miss+' 行没选。';
   }
   return null;
 }
 
 function renderEnd(){
   secEl.textContent='最后'; cntEl.textContent='完成'; fillEl.style.width='100%';
-  var h='<div class="done">';
-  h+='<div class="big">填完了，谢谢你。</div><p>汇总结果整理好之后会发回各个群。</p>';
-  h+='<div class="tools"><button id="see">看这次的答案</button>'+
-     '<button id="copy">复制答案</button><button id="again">重新走一遍</button></div>'+
-     '<pre id="dump" hidden></pre></div>';
-  stage.innerHTML=h;
+  stage.innerHTML='<div class="done"><div class="big">填完了，谢谢你。</div>'+
+    '<p>汇总结果整理好之后会发回各个群。</p>'+
+    '<div class="tools"><button id="see">看这次的答案</button>'+
+    '<button id="copy">复制答案</button><button id="again">重新走一遍</button></div>'+
+    '<pre id="dump" hidden></pre></div>';
   prevB.hidden=true; nextB.hidden=true;
-
   document.getElementById('see').onclick=function(){
-    var d=document.getElementById('dump'); d.hidden=!d.hidden; d.textContent=dump();
-  };
+    var d=document.getElementById('dump'); d.hidden=!d.hidden; d.textContent=dump(); };
   document.getElementById('copy').onclick=function(){
-    var t=dump(), ta=document.createElement('textarea');
-    ta.value=t; document.body.appendChild(ta); ta.select();
+    var ta=document.createElement('textarea'); ta.value=dump();
+    document.body.appendChild(ta); ta.select();
     try{ document.execCommand('copy'); this.textContent='已复制'; }catch(e){ this.textContent='复制失败'; }
-    document.body.removeChild(ta);
-  };
+    document.body.removeChild(ta); };
   document.getElementById('again').onclick=function(){
-    A={}; histIdx=[]; cur=0; ended=null; q8order=null; nextB.hidden=false; render();
-  };
+    A={}; histIdx=[]; cur=0; ended=false; q4order=null; nextB.hidden=false; render(); };
 }
 
 function dump(){
   var out=[];
   Q.forEach(function(q){
     if(!visible(q)) return;
-    var v=A[q.id]; if(v===undefined||v===''||(Array.isArray(v)&&!v.length)) { out.push(q.id+'　（未答）'); return; }
-    var s;
-    if(q.type==='single') s=q.opts[v];
+    var v=A[q.id], s;
+    if(v===undefined||v===''||(Array.isArray(v)&&!v.length)) s='（未答）';
+    else if(q.type==='single') s=q.opts[v];
     else if(q.type==='multi') s=v.map(function(i){return q.opts[i]}).join(' / ');
     else if(q.type==='matrix') s=q.rows.map(function(r,i){return r.k+'='+(q.cols[v[i]]||'—')}).join('　');
     else s=v;
     if(A[q.id+'_other']) s+='（其他：'+A[q.id+'_other']+'）';
     out.push(q.id+'　'+s);
+    if(q.extra && A[q.extra.id]) out.push(q.extra.id+'　'+A[q.extra.id]);
   });
   return out.join('\n');
 }
 
 nextB.onclick=function(){
-  var q=Q[cur];
-  var e=validate(q);
+  var q=Q[cur], e=validate(q);
   if(e){ errEl.textContent=e; return; }
   var vl=visList();
-  if(vl.indexOf(q)===vl.length-1){ ended='A'; render(); return; }
+  if(vl.indexOf(q)===vl.length-1){ ended=true; render(); return; }
   histIdx.push(cur);
   var n=cur+1;
   while(n<Q.length && !visible(Q[n])) n++;
-  if(n>=Q.length){ ended='A'; render(); return; }
+  if(n>=Q.length){ ended=true; render(); return; }
   cur=n; render();
 };
 prevB.onclick=function(){
-  // 往回跳时要跳过「因为改了前面的答案而变得不该出现」的题
   while(histIdx.length){
     var p=histIdx.pop();
-    if(visible(Q[p])){ cur=p; ended=null; nextB.hidden=false; render(); return; }
+    if(visible(Q[p])){ cur=p; ended=false; nextB.hidden=false; render(); return; }
   }
 };
 document.addEventListener('keydown',function(e){
