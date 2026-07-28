@@ -178,12 +178,13 @@ var Q = [
   '谁能见到 TA，我说了算','我想删的时候能删掉','其他'],
  other:[5]},
 
-{id:'q10',sec:'一些假想的情况',type:'single',req:true,show:own,
+{id:'q10',sec:'一些假想的情况',type:'multi',req:true,show:own,
  title:'TA 有没有被别人（朋友、语C 搭子、团里、写手）写出过、演出过你没预料到的剧情？',
- hint:'有过好几次的话，说印象最深的那次就行。',
+ hint:'发生过不止一次的话，几种反应都可以选。',
  opts:['有，我挺喜欢，收藏了 / 当成 if 线','有，我当没看见，不影响我自己的设定',
   '有，我去跟对方沟通了','有，之后我就不太敢把设定给别人了','没发生过',
-  '我从来没把 TA 给别人看过']},
+  '我从来没把 TA 给别人看过'],
+ excl:[4,5]},
 
 // ================= 你平时用什么 =================
 {id:'q4',sec:'你平时用什么',type:'multi',req:true,lim:3,random:true,show:hasTA,
@@ -211,7 +212,7 @@ var Q = [
  excl:[7]},
 
 {id:'q6',sec:'你平时用什么',type:'single',req:true,show:usedChar,
- title:'像猫箱、C.AI 这种能跟角色聊天的 App，你后来还在玩吗？',
+ title:'能跟角色聊天的那类 App（猫箱、C.AI 那种），你后来还在玩吗？',
  opts:['一直在玩，玩得挺勤','还在玩，但比以前少了','转去玩别的了（酒馆之类）',
   '玩过一阵，后来淡了——说话不太像那个角色',
   '玩过一阵，后来淡了——记不住之前发生的事',
@@ -221,7 +222,7 @@ var Q = [
 {id:'q11',sec:'你平时用什么',type:'single',req:true,
  title:'在你常待的圈子里，提到「用 AI 参与创作」大概是什么氛围？',
  opts:['挺平常的，没什么人特别在意','有人用，但一般不会特意说','有一些争议',
-  '大家普遍不太能接受','不太清楚']},
+  '大家普遍不太能接受','不太清楚','我没有常待的圈子']},
 
 // ================= 最后 =================
 {id:'q12',sec:'最后',type:'area',show:hasTA,
@@ -271,7 +272,8 @@ function render(){
   var q=Q[cur], vl=visList(), pos=vl.indexOf(q)+1, tot=vl.length;
   if(pos<1){ pos=1; }
   secEl.textContent=q.sec;
-  cntEl.textContent=pos+' / '+tot;
+  // 只显示「第 N 题」不显示总数——总数会随分支变（12→10→11），受访者会觉得问卷忽长忽短
+  cntEl.textContent='第 '+pos+' 题';
   fillEl.style.width=(pos/tot*100)+'%';
 
   var h='<div class="qbody">';
@@ -312,10 +314,14 @@ function render(){
     var v=A[q.id]||[];
     q.rows.forEach(function(r,ri){
       if(r.g) h+='<div class="grp">'+esc(r.g)+'</div>';
-      h+='<div class="row" data-row="'+ri+'"><div class="rowt"><b>'+r.k+'</b>'+esc(r.t)+'</div><div class="scale">';
+      // role=radiogroup + 每个选项带完整 aria-label，读屏才会读成「TA 能跟你说话 —— 愿意试试」
+      // 而不是光读「愿意试试」；行首字母加 aria-hidden，否则会被连读成「ATA 能…」
+      h+='<div class="row" data-row="'+ri+'" role="radiogroup" aria-label="'+esc(r.t)+'">'+
+         '<div class="rowt"><b aria-hidden="true">'+r.k+'</b>'+esc(r.t)+'</div><div class="scale">';
       q.cols.forEach(function(c,ci){
         h+='<label class="'+(v[ri]===ci?'sel':'')+'" data-row="'+ri+'" data-col="'+ci+'">'+
-          '<input type="radio" name="'+q.id+'_'+ri+'" '+(v[ri]===ci?'checked':'')+'>'+esc(c)+'</label>';
+          '<input type="radio" name="'+q.id+'_'+ri+'" aria-label="'+esc(r.t+' —— '+c)+'" '+
+          (v[ri]===ci?'checked':'')+'>'+esc(c)+'</label>';
       });
       h+='</div></div>';
     });
