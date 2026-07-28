@@ -406,13 +406,16 @@ function validate(q){
   if(q.type==='multi')  return (!v||!v.length)?'至少选一个再往下吧。':null;
   if(q.type==='text'||q.type==='area') return (!v||!v.replace(/\s/g,''))?'这题要填一下才能继续。':null;
   if(q.type==='matrix'){
-    if(!v) return '每一行都选一个再往下吧。';
-    var miss=0;
+    if(!v) v=[];
+    var miss=0, first=null;
     for(var i=0;i<q.rows.length;i++) if(v[i]===undefined){
-      miss++; var el=stage.querySelector('[data-row="'+i+'"]');
-      if(el&&el.classList) el.classList.add('miss');
+      miss++;
+      var el=stage.querySelector('[data-row="'+i+'"]');
+      if(el&&el.classList){ el.classList.add('miss'); if(!first) first=el; }
     }
-    if(miss) return '还有 '+miss+' 行没选，标红的那几行往上翻一下。';
+    // 自动滚到第一个没选的行，不让人自己往回找
+    if(first && first.scrollIntoView) first.scrollIntoView({block:'center'});
+    if(miss) return '还有 '+miss+' 行没选，已经帮你跳到第一行没选的了。';
   }
   return null;
 }
