@@ -150,6 +150,11 @@ var Q = [
   '以上都还没做过，TA 主要活在我自己心里'],
  excl:[14],other:[13]},
 
+{id:'qmoney',sec:'你和你的角色',type:'single',req:true,show:hasTA,
+ title:'过去一年，你在 TA 身上（或者这个爱好上）大概花过多少钱？',
+ hint:'约稿、周边、谷子、印本、软件充值都算。',
+ opts:['没花过','100 元以内','100–500 元','500–2000 元','2000 元以上','不想说']},
+
 // ========== 一些假想的情况（排在 AI 题之前，避免被 AI 语境带偏）==========
 {id:'q7',sec:'一些假想的情况',type:'matrix',req:true,show:hasTA,
  note:'下面几题说的是一些假想的情况，现实里不一定有。只想知道你的第一反应，不用管现在能不能做到。觉得「完全不行」也是一种答案，和选别的一样有用。',
@@ -160,10 +165,10 @@ var Q = [
   {g:'TA 能走到哪一步 · 下面几行都只有你自己看得到',k:'A',t:'TA 能跟你一来一回地说话'},
   {k:'B',t:'TA 会自己拿主意，把剧情往下推'},
   {k:'C',t:'同一场戏里还有别的角色在（故事里的配角，不是别人的 OC），跟 TA 有来有往'},
-  {g:'谁能跟 TA 说上话 · 下面几行都假设 TA 已经能开口',k:'D',t:'只有你自己'},
-  {k:'E',t:'你指定的朋友也能跟 TA 说说话'},
-  {k:'F',t:'任何人都能跟 TA 说说话'},
-  {g:'跟别人的角色同台',k:'G',t:'TA 和别人家的孩子，在同一个故事里对戏'}]},
+  {g:'谁能跟 TA 说上话 · 下面几行都假设 TA 已经能开口，而且默认只有你自己看得到',
+   k:'D',t:'你指定的朋友也能跟 TA 说说话'},
+  {k:'E',t:'任何人都能跟 TA 说说话'},
+  {g:'跟别人的角色同台',k:'F',t:'TA 和别人家的孩子，在同一个故事里对戏'}]},
 
 {id:'q8',sec:'一些假想的情况',type:'multi',show:hasTA,
  title:'刚才有几行你选了「有条件可以」——那个「条件」主要是指什么？',
@@ -187,6 +192,12 @@ var Q = [
   '跑团带 TA 上场','做动画 / PV / 动态漫','找人帮 TA 配音','让 AI 帮忙',
   '没特别想过'],
  excl:[7]},
+
+{id:'q4b',sec:'你平时用什么',type:'single',show:function(){ return has('q4',6); },
+ title:'刚才你选了「让 AI 帮忙」——主要是想让它帮什么？',
+ hint:'选填。',
+ opts:['画 TA','写 TA 的故事','陪 TA 说说话','配 TA 的声音','别的'],
+ other:[4]},
 
 {id:'q5',sec:'你平时用什么',type:'multi',req:true,
  title:'下面这些，你碰过哪些？',
@@ -344,6 +355,7 @@ function bind(q){
           }
           A[q.id]=v;
           if(q.id==='q5') { delete A['q6']; }   // 改了工具清单，Q6 的旧答案作废
+          if(q.id==='q4' && !has('q4',6)) { delete A['q4b']; delete A['q4b_other']; } // 取消了「让 AI 帮忙」
         }
         render();
       });
@@ -373,7 +385,7 @@ function bind(q){
 
 // 改了 Q1 就清掉所有分支专属的旧答案，防止残留混进导出
 function clearBranch(){
-  ['b1','b2','q2','q3','q7','q8','q10','q4','q12','q1name'].forEach(function(k){
+  ['b1','b2','q2','q3','qmoney','q7','q8','q10','q4','q4b','q12','q1name'].forEach(function(k){
     var q=null; for(var i=0;i<Q.length;i++) if(Q[i].id===k) q=Q[i];
     if(q && !visible(q)){ delete A[k]; delete A[k+'_other']; }
   });
