@@ -1,0 +1,341 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>OC 问卷 · 流程图（录入用）</title>
+<style>
+:root{
+  --bg:#f7f6f4; --card:#fff; --ink:#1c1b19; --sub:#6b6862; --line:#e0ddd7;
+  --a:#7a5c3e;            /* 主色 */
+  --all:#4a7c59;          /* 所有人 */
+  --ta:#7a5c3e;           /* 有 TA 的人 */
+  --oc:#8a5a2b;           /* 只有自设 */
+  --none:#5b6b8a;         /* 都没有 */
+  --cond:#9a4a4a;         /* 条件题 */
+}
+@media (prefers-color-scheme:dark){
+  :root{ --bg:#15151a; --card:#1e1e24; --ink:#e8e6e1; --sub:#9a968e; --line:#2f2f37;
+    --a:#c9a077; --all:#7fb28d; --ta:#c9a077; --oc:#d8ad74; --none:#93a7cc; --cond:#d98a8a; }
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font:15px/1.65 -apple-system,"PingFang SC","Microsoft YaHei","Noto Sans SC",sans-serif;
+  -webkit-font-smoothing:antialiased;padding:0 0 70px}
+.wrap{max-width:820px;margin:0 auto;padding:0 18px}
+
+header{padding:34px 0 8px}
+h1{font-size:24px;margin:0 0 6px;font-weight:600;letter-spacing:.5px}
+.sub{color:var(--sub);font-size:13.5px;margin:0}
+
+.legend{display:flex;flex-wrap:wrap;gap:8px;margin:20px 0 6px}
+.lg{display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--sub);
+  border:1px solid var(--line);border-radius:20px;padding:4px 11px;background:var(--card)}
+.dot{width:9px;height:9px;border-radius:50%;flex:none}
+
+.split{background:var(--card);border:1px solid var(--line);border-radius:12px;
+  padding:18px 20px;margin:22px 0 4px}
+.split h2{font-size:15px;margin:0 0 14px;font-weight:600;color:var(--a);letter-spacing:.5px}
+.branch{display:flex;gap:12px;align-items:flex-start;padding:9px 0;font-size:14px;line-height:1.6}
+.branch + .branch{border-top:1px dashed var(--line)}
+.bk{flex:none;font-weight:600;min-width:78px;font-size:13px}
+.bk.p1{color:var(--oc)} .bk.p2{color:var(--ta)} .bk.p3{color:var(--none)}
+.branch em{font-style:normal;color:var(--sub);font-size:13px}
+
+.chain{margin-top:26px}
+.node{position:relative;background:var(--card);border:1px solid var(--line);
+  border-left:4px solid var(--ta);border-radius:10px;padding:15px 17px;margin:0 0 34px}
+.node.all{border-left-color:var(--all)}
+.node.oc{border-left-color:var(--oc)}
+.node.none{border-left-color:var(--none)}
+.node.cond{border-left-color:var(--cond);border-style:dashed;border-left-style:solid}
+.node::after{content:"";position:absolute;left:50%;bottom:-34px;width:1px;height:34px;
+  background:var(--line)}
+.node:last-child::after{display:none}
+
+.nh{display:flex;align-items:baseline;gap:9px;flex-wrap:wrap;margin-bottom:7px}
+.qid{font-weight:700;color:var(--a);font-size:13px;letter-spacing:.5px}
+.qtitle{font-size:15.5px;font-weight:500;line-height:1.55;flex:1 1 240px}
+.tags{display:flex;gap:5px;flex-wrap:wrap;margin:6px 0 0}
+.t{font-size:11px;border:1px solid var(--line);border-radius:4px;padding:1px 7px;color:var(--sub);white-space:nowrap}
+.t.hot{border-color:var(--a);color:var(--a)}
+.t.must{border-color:var(--cond);color:var(--cond)}
+
+.cond{background:rgba(154,74,74,.09);border-radius:7px;padding:8px 11px;margin:10px 0 0;
+  font-size:12.5px;color:var(--cond);line-height:1.6}
+.cond b{font-weight:600}
+.hintline{font-size:12.5px;color:var(--sub);margin:7px 0 0;line-height:1.6}
+
+ol.op{margin:11px 0 0;padding:0 0 0 4px;list-style:none;font-size:13.5px;line-height:1.75;color:var(--sub)}
+ol.op li{padding:1px 0}
+ol.op li::before{content:"·";margin-right:8px;color:var(--line)}
+ol.op li.x{color:var(--ink)}
+ol.op li.x::before{content:"■";color:var(--cond);font-size:9px;vertical-align:2px}
+ol.op li.o::before{content:"✎";color:var(--a);font-size:11px}
+
+table.mx{width:100%;border-collapse:collapse;margin:11px 0 0;font-size:13px}
+table.mx th{text-align:left;font-weight:600;color:var(--a);font-size:12px;
+  padding:9px 6px 5px;border-bottom:1px solid var(--line)}
+table.mx td{padding:7px 6px;border-bottom:1px solid var(--line);vertical-align:top;line-height:1.6}
+table.mx td.k{width:26px;color:var(--a);font-weight:700}
+.grpname{font-size:12px;color:var(--a);font-weight:600;padding:12px 6px 3px !important;border:0 !important}
+
+.end{background:var(--card);border:1px solid var(--line);border-radius:10px;
+  padding:16px 18px;text-align:center;color:var(--sub);font-size:13.5px;margin-top:6px}
+
+.notice{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--a);
+  border-radius:10px;padding:16px 18px;margin:26px 0 0;font-size:13.5px;line-height:1.8}
+.notice h3{margin:0 0 9px;font-size:14px;color:var(--a);font-weight:600}
+.notice ol{margin:0;padding-left:20px} .notice li{margin:5px 0}
+.notice code{background:var(--bg);border:1px solid var(--line);border-radius:4px;
+  padding:1px 5px;font-size:12.5px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>OC 问卷 · 流程图</h1>
+  <p class="sub">照着往问卷星 / 腾讯问卷里录。左边色条 = 谁能看到这题；红框 = 条件题，要配显示逻辑。</p>
+</header>
+
+<div class="legend">
+  <span class="lg"><i class="dot" style="background:var(--all)"></i>所有人</span>
+  <span class="lg"><i class="dot" style="background:var(--ta)"></i>有 TA 的人（有自设 + 只有本命）</span>
+  <span class="lg"><i class="dot" style="background:var(--oc)"></i>只有「有自设」的人</span>
+  <span class="lg"><i class="dot" style="background:var(--none)"></i>只有「都没有」的人</span>
+  <span class="lg"><i class="dot" style="background:var(--cond)"></i>条件题</span>
+  <span class="lg">■ 排他项</span>
+  <span class="lg">✎ 带填空</span>
+</div>
+
+<div class="split">
+  <h2>第 1 题分流</h2>
+  <div class="branch"><span class="bk p1">A 线</span>
+    <span>有 1 个 / 2–5 个 / 6 个以上　<em>→ 全部题目，13–16 题</em></span></div>
+  <div class="branch"><span class="bk p2">B 线</span>
+    <span>没有自设，但有特别喜欢的角色　<em>→ 跳过 Q2、Q10，11–14 题</em></span></div>
+  <div class="branch"><span class="bk p3">C 线</span>
+    <span>都没有　<em>→ 走 b1、b2，之后只剩 Q5 / Q11 / 年龄 / 联系方式，7 题</em></span></div>
+</div>
+
+<div class="chain">
+
+<div class="node all">
+  <div class="nh"><span class="qid">Q1</span><span class="qtitle">你有自己的自设（OC）吗？</span></div>
+  <div class="tags"><span class="t must">必答</span><span class="t">单选</span><span class="t hot">分流点</span></div>
+  <p class="hintline"><b>题上方放开场说明：</b>学生做的一个小调查，关于大家平时怎么养自己的 OC。匿名（除非你最后自愿留个联系方式），大概三五分钟。没有 OC、不太懂这些词也没关系，一样可以填。汇总结果整理好之后会发回群里。</p>
+  <ol class="op">
+    <li>有，1 个</li><li>有，2–5 个</li><li>有，6 个以上</li>
+    <li>没有自设，但有特别喜欢的角色（动漫、游戏、剧里的都算）</li>
+    <li>都没有</li>
+  </ol>
+  <div class="cond"><b>附加填空（选填 · 20 字内）</b>：选了前四项之一时，题目下方出现一个短填空 ——
+  「挑一个你最放在心上的，写下 TA 的名字或代号——后面的题都只针对 TA。」<br>
+  平台不支持选项后附加填空的话，就拆成独立一题，显示逻辑挂 Q1 前四项。</div>
+</div>
+
+<div class="node none">
+  <div class="nh"><span class="qid">b1</span><span class="qtitle">你有没有想过要一个属于自己的角色？</span></div>
+  <div class="tags"><span class="t must">必答</span><span class="t">单选</span></div>
+  <div class="cond"><b>显示条件</b>：Q1 = 都没有</div>
+  <ol class="op"><li>一直想，但没真的动手</li><li>试过，没弄成</li><li>偶尔会想想</li><li>没有过</li></ol>
+</div>
+
+<div class="node none">
+  <div class="nh"><span class="qid">b2</span><span class="qtitle">如果有个地方能帮你把一个角色的性格、来历慢慢定下来，之后还能跟这个角色说上话——你会想试试吗？</span></div>
+  <div class="tags"><span class="t must">必答</span><span class="t">单选</span></div>
+  <div class="cond"><b>显示条件</b>：Q1 = 都没有</div>
+  <ol class="op"><li>挺想试的</li><li>有点兴趣，看效果</li><li>说不好</li><li>不太想</li><li>完全不想</li></ol>
+</div>
+
+<div class="node oc">
+  <div class="nh"><span class="qid">Q2</span><span class="qtitle">关于 TA，下面这些你心里已经有答案的有哪些？</span></div>
+  <div class="tags"><span class="t must">必答</span><span class="t">多选</span></div>
+  <div class="cond"><b>显示条件</b>：Q1 = 有 1 个 / 2–5 个 / 6 个以上（B 线、C 线都跳过）</div>
+  <p class="hintline">提示语：想到就算，不用写下来。</p>
+  <ol class="op">
+    <li>性格、行为逻辑</li><li>说话方式、口癖、自称</li><li>背景故事、前史</li>
+    <li>和其他角色的关系</li><li>所处的世界观 / 时代 / 势力</li><li>结局或命运走向</li>
+    <li>标志性的动作、习惯、小癖好</li><li>外貌</li><li>服装 / 武器 / 随身的东西</li>
+    <li>声音（音色、声优想象）</li>
+    <li class="x">都还没怎么定，TA 还在慢慢长</li>
+  </ol>
+</div>
+
+<div class="node">
+  <div class="nh"><span class="qid">Q3</span><span class="qtitle">你平时都为 TA 做过些什么？</span></div>
+  <div class="tags"><span class="t must">必答</span><span class="t">多选</span></div>
+  <div class="cond"><b>显示条件</b>：Q1 ≠ 都没有</div>
+  <ol class="op">
+    <li>写文（同人文 / 小说 / 日记体）</li><li>写设定集</li>
+    <li>给 TA 整理过设定卡 / 人物卡</li><li>找画师约稿 / 自己画图</li>
+    <li>给 TA 配音 / 找声音素材</li><li>做动画、MAD、动态图</li>
+    <li>做 3D 模型 / MMD / VRChat</li><li>做周边、印本、表情包</li>
+    <li class="o">其他 ______</li>
+    <li class="x">以上都还没做过，TA 主要活在我自己心里</li>
+  </ol>
+</div>
+
+<div class="node">
+  <div class="nh"><span class="qid">Q4</span><span class="qtitle">近一年，你在 TA 身上（或者这个爱好上）大概花过多少钱？</span></div>
+  <div class="tags"><span class="t must">必答</span><span class="t">单选</span></div>
+  <div class="cond"><b>显示条件</b>：Q1 ≠ 都没有</div>
+  <p class="hintline">提示语：约稿、周边、谷子、印本、软件充值都算。</p>
+  <ol class="op"><li>没花过</li><li>100 元以内</li><li>100–500 元</li><li>500–2000 元</li>
+    <li>2000 元以上</li><li>不想说</li></ol>
+</div>
+
+<div class="node">
+  <div class="nh"><span class="qid">Q5</span><span class="qtitle">假设有个办法能让 TA 活过来，下面每种情况你觉得怎么样？</span></div>
+  <div class="tags"><span class="t must">必答</span><span class="t hot">矩阵单选 · 4 列 × 6 行</span></div>
+  <div class="cond"><b>显示条件</b>：Q1 ≠ 都没有<br>
+  <b>本节开头放这段：</b>下面几题说的是一些假想的情况，现实里不一定有。只想知道你的第一反应，不用管现在能不能做到。觉得「完全不行」也是一种答案，和选别的一样有用。</div>
+  <p class="hintline">矩阵上方小字：先别管靠什么办法——自己找人、用工具，都算。只看这件事本身你接不接受。</p>
+  <table class="mx">
+    <tr><th colspan="2">行</th><th style="width:44%">列（四档，每行单选）</th></tr>
+    <tr><td colspan="3" class="grpname">TA 自己能做到什么 · 下面几行都只有你自己看得到</td></tr>
+    <tr><td class="k">A</td><td>TA 能跟你一来一回地对话</td>
+        <td rowspan="8" style="color:var(--sub)">愿意试试<br>有条件可以<br>不太愿意<br>完全不行</td></tr>
+    <tr><td class="k">B</td><td>TA 会说出你没想到的话、做你没安排的事</td></tr>
+    <tr><td colspan="2" class="grpname">谁能跟 TA 对话 · 下面几行都假设 TA 已经能开口，而且默认只有你自己看得到</td></tr>
+    <tr><td class="k">C</td><td>你指定的朋友也能跟 TA 对话</td></tr>
+    <tr><td class="k">D</td><td>谁都能跟 TA 对话</td></tr>
+    <tr><td colspan="2" class="grpname">故事里还有谁跟 TA 同台</td></tr>
+    <tr><td class="k">E</td><td>故事里还有别的角色在（配角，不是别人家的孩子），会跟 TA 你来我往</td></tr>
+    <tr><td class="k">F</td><td>TA 和别人家的孩子，在同一个故事里对戏</td></tr>
+  </table>
+</div>
+
+<div class="node">
+  <div class="nh"><span class="qid">Q6</span><span class="qtitle">刚才有几行你选了「有条件可以」——那个「条件」主要是指什么？</span></div>
+  <div class="tags"><span class="t">选填</span><span class="t">多选</span></div>
+  <div class="cond"><b>显示条件</b>：Q1 ≠ 都没有。<br>
+  理想情况是「Q5 至少一行选了『有条件可以』才显示」，但矩阵当条件多数平台做不到 ——
+  <b>直接对所有人显示，不配这个条件</b>，提示语里已经写了「没选过的直接跳过就行」。</div>
+  <p class="hintline">提示语：选填。刚才没选过「有条件可以」的话，直接跳过就行。</p>
+  <ol class="op"><li>得够像 TA，不能崩</li><li>TA 说的话我能改、能撤</li>
+    <li>只有我自己看得到，不公开</li><li>谁能见到 TA，我说了算</li>
+    <li>我想删的时候能删掉</li><li class="o">其他 ______</li></ol>
+</div>
+
+<div class="node oc">
+  <div class="nh"><span class="qid">Q7</span><span class="qtitle">TA 有没有被别人（朋友、语C 搭子、团里、写手）写出过、演出过你没预料到的剧情？</span></div>
+  <div class="tags"><span class="t must">必答</span><span class="t">多选</span></div>
+  <div class="cond"><b>显示条件</b>：Q1 = 有 1 个 / 2–5 个 / 6 个以上</div>
+  <p class="hintline">提示语：发生过不止一次的话，几种反应都可以选。</p>
+  <ol class="op"><li>有，我挺喜欢，收藏了 / 当成 if 线</li>
+    <li>有，我当没看见，不影响我自己的设定</li><li>有，我去跟对方沟通了</li>
+    <li>有，之后我就不太敢把设定给别人了</li>
+    <li class="x">没发生过</li><li class="x">我从来没把 TA 给别人看过</li></ol>
+</div>
+
+<div class="node">
+  <div class="nh"><span class="qid">Q8</span><span class="qtitle">如果能让 TA 活起来，你愿意试哪些方法？</span></div>
+  <div class="tags"><span class="t must">必答</span><span class="t">多选</span><span class="t hot">最多选 3</span><span class="t hot">选项随机排序</span></div>
+  <div class="cond"><b>显示条件</b>：Q1 ≠ 都没有<br>
+  <b>必须开选项随机排序</b>，但「其他」和「没特别想过」两项固定在最后不参与随机 ——
+  平台一般有「最后 N 项不随机」的设置，填 2。</div>
+  <ol class="op"><li>做动画</li><li>找人配音</li><li>让 AI 帮忙</li>
+    <li>找画师约稿 / 自己画</li><li>自己写文</li><li>跑团带 TA 上场</li>
+    <li class="o">其他 ______</li><li class="x">没特别想过</li></ol>
+</div>
+
+<div class="node cond">
+  <div class="nh"><span class="qid">Q9</span><span class="qtitle">刚才你选了「让 AI 帮忙」——主要是想让它帮什么？</span></div>
+  <div class="tags"><span class="t">选填</span><span class="t">单选</span></div>
+  <div class="cond"><b>显示条件</b>：Q8 勾了「让 AI 帮忙」</div>
+  <ol class="op"><li>画 TA</li><li>写 TA 的故事</li><li>陪 TA 说说话</li>
+    <li>配 TA 的声音</li><li class="o">别的 ______</li></ol>
+</div>
+
+<div class="node all">
+  <div class="nh"><span class="qid">Q10</span><span class="qtitle">下面这些工具，你接触过哪些？</span></div>
+  <div class="tags"><span class="t must">必答</span><span class="t">多选</span><span class="t hot">后面 2 题的触发源</span></div>
+  <p class="hintline">提示语：用过、试过、随便玩过都算。</p>
+  <ol class="op"><li>找参考图、素材图库</li><li>修图 / 画图软件</li><li>语音合成、配音工具</li>
+    <li>AI 聊天（DeepSeek / 豆包 那种）</li>
+    <li>角色互动软件（猫箱、C.AI 之类）</li>
+    <li>在猫箱、C.AI 这类软件里自己捏过角色</li>
+    <li>酒馆（SillyTavern）那类要自己折腾的</li>
+    <li class="o">其他 ______</li>
+    <li class="x">都没怎么碰过</li></ol>
+</div>
+
+<div class="node cond">
+  <div class="nh"><span class="qid">Q11</span><span class="qtitle">猫箱、C.AI 这类角色互动软件，你现在还在玩吗？</span></div>
+  <div class="tags"><span class="t must">必答</span><span class="t">单选</span></div>
+  <div class="cond"><b>显示条件</b>：Q10 勾了「角色互动软件」/「自己捏过角色」/「酒馆」三项中的任意一项</div>
+  <ol class="op"><li>一直在玩，玩得挺勤</li><li>还在玩，但比以前少了</li>
+    <li>转去玩别的了（酒馆之类）</li><li>玩过一阵，后来淡了</li><li>没碰过这类软件</li></ol>
+</div>
+
+<div class="node cond">
+  <div class="nh"><span class="qid">Q12</span><span class="qtitle">后来为什么淡了？</span></div>
+  <div class="tags"><span class="t">选填</span><span class="t">单选</span></div>
+  <div class="cond"><b>显示条件</b>：Q11 = 玩过一阵，后来淡了</div>
+  <ol class="op"><li>说话不太像那个角色</li><li>记不住之前发生的事</li><li>没什么新鲜感了</li>
+    <li>内容限制太多</li><li>要花钱 / 额度不够</li><li class="o">别的原因 ______</li></ol>
+</div>
+
+<div class="node all">
+  <div class="nh"><span class="qid">Q13</span><span class="qtitle">你身边有没有见过因为用 AI 而吵起来的？</span></div>
+  <div class="tags"><span class="t must">必答</span><span class="t">单选</span></div>
+  <ol class="op"><li>见过，吵得挺凶</li><li>见过，小范围说过几句</li>
+    <li>没见过，但感觉有人不太乐意</li><li>没见过，大家都挺平常的</li>
+    <li>没太注意 / 说不好</li></ol>
+</div>
+
+<div class="node">
+  <div class="nh"><span class="qid">Q14</span><span class="qtitle">如果要跟一个完全不认识 TA 的人介绍 TA，你会怎么说？</span></div>
+  <div class="tags"><span class="t">选填</span><span class="t">多行填空</span></div>
+  <div class="cond"><b>显示条件</b>：Q1 ≠ 都没有</div>
+  <p class="hintline">提示语：几句话，怎么顺口怎么写。选填。</p>
+</div>
+
+<div class="node all">
+  <div class="nh"><span class="qid">Q15</span><span class="qtitle">你今年多大？</span></div>
+  <div class="tags"><span class="t must">必答</span><span class="t">单选</span><span class="t hot">闸门题</span></div>
+  <p class="hintline">提示语：选个范围就行。</p>
+  <ol class="op"><li>15 岁及以下</li><li>16–17 岁</li><li>18–22 岁</li>
+    <li>23–27 岁</li><li>28 岁及以上</li><li>不想说</li></ol>
+  <div class="cond"><b>为什么必须排在联系方式前面</b>：这题不是统计题，是闸门 ——
+  <b>勾前两档（未满 18）的人不发访谈邀约</b>，「不想说」按未成年处理。
+  排在联系方式前面，才能保证凡是留了联系方式的人都答过年龄。</div>
+</div>
+
+<div class="node all">
+  <div class="nh"><span class="qid">Q16</span><span class="qtitle">留个方便的联系方式吧，哪种都可以。</span></div>
+  <div class="tags"><span class="t">选填</span><span class="t">单行填空</span></div>
+  <p class="hintline">提示语：比如 QQ 号，或者邮箱，你常用的任何一个都行。不想留直接提交就好。<br>
+  只用于之后找你多聊几句（半小时左右，文字聊，可以匿名），不会加你别的群，也不会发广告。</p>
+  <p class="hintline">输入框 placeholder：写哪种都行</p>
+</div>
+
+<div class="end">结束页（所有人共用）<br>填完了，谢谢你。汇总结果整理好之后会发回各个群。</div>
+
+</div>
+
+<div class="notice">
+  <h3>录完之后，按这五条路径各走一遍</h3>
+  <ol>
+    <li>Q1 选「有，1 个」，Q8 不选 AI、Q10 不选角色软件 → 应看到 <code>Q1 Q2 Q3 Q4 Q5 Q6 Q7 Q8 Q10 Q13 Q14 Q15 Q16</code>，13 题</li>
+    <li>Q1 选「有，1 个」，Q8 选了「让 AI 帮忙」、Q10 选了角色软件、Q11 选「后来淡了」→ 16 题（最长）</li>
+    <li>Q1 选「没有自设，但有特别喜欢的角色」→ Q2、Q7 不出现</li>
+    <li>Q1 选「都没有」→ 只剩 <code>Q1 b1 b2 Q10 Q13 Q15 Q16</code>，7 题</li>
+    <li>Q10 只勾「都没怎么碰过」→ Q11、Q12 都不该出现</li>
+  </ol>
+  <p style="margin:10px 0 0;color:var(--sub)">条件逻辑配错了平台不会报错，只会静默把人送进死胡同。这五条必须自己走一遍。</p>
+</div>
+
+<div class="notice">
+  <h3>还没定的两件事</h3>
+  <ol>
+    <li><b>题量顶到 16</b>（最长路径），超过原定的 15 上限。要压回去最省的一刀是砍 Q14（介绍 TA），代价是丢掉全卷唯一能看出表达能力的地方。</li>
+    <li><b>跑团</b>在 Q3 删了、在 Q8 留着，按字面指示照做，如果不是本意需要改回。</li>
+  </ol>
+</div>
+
+</div>
+</body>
+</html>
