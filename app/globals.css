@@ -1,0 +1,973 @@
+@import "tailwindcss";
+
+:root {
+  --ink: #171510;
+  --paper: #f3eee3;
+  --paper-deep: #e4dac7;
+  --red: #cf432e;
+  --red-dark: #8d2b20;
+  --line: rgba(23, 21, 16, 0.18);
+  --muted: #6d675b;
+  --white: #fffdf8;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--paper);
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background:
+    linear-gradient(rgba(23, 21, 16, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(23, 21, 16, 0.025) 1px, transparent 1px),
+    var(--paper);
+  background-size: 30px 30px;
+  color: var(--ink);
+  font-family: "Noto Sans SC", "Microsoft YaHei", "PingFang SC", sans-serif;
+}
+
+button,
+input,
+textarea {
+  font: inherit;
+}
+
+button {
+  color: inherit;
+}
+
+button:focus-visible,
+input:focus-visible,
+label:has(input:focus-visible) {
+  outline: 2px solid var(--red);
+  outline-offset: 3px;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.survey-shell {
+  position: relative;
+  min-height: 100vh;
+  overflow: hidden;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: min(1040px, calc(100% - 48px));
+  margin: 0 auto;
+  padding: 28px 0 18px;
+}
+
+.brand,
+.eyebrow,
+.section-label,
+.step-count {
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.step-count {
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.progress-track {
+  width: min(1040px, calc(100% - 48px));
+  height: 3px;
+  margin: 0 auto;
+  overflow: hidden;
+  background: var(--line);
+}
+
+.progress-fill {
+  height: 100%;
+  background: var(--red);
+  transition: width 360ms ease;
+}
+
+.question-panel {
+  width: min(820px, calc(100% - 48px));
+  margin: 0 auto;
+  padding: 68px 0 72px;
+  animation: panel-in 260ms ease both;
+}
+
+.section-label,
+.eyebrow {
+  color: var(--red);
+}
+
+.question-panel h1,
+.intro-panel h1,
+.finish-panel h1 {
+  margin: 14px 0 0;
+  font-family: "STSong", "Songti SC", "SimSun", serif;
+  font-size: clamp(32px, 5vw, 54px);
+  font-weight: 600;
+  letter-spacing: -0.045em;
+  line-height: 1.2;
+}
+
+.question-panel h1 sup {
+  position: relative;
+  top: -0.18em;
+  margin-left: 5px;
+  color: var(--red);
+  font-family: sans-serif;
+  font-size: 17px;
+}
+
+.question-description {
+  max-width: 720px;
+  margin: 18px 0 0;
+  color: var(--muted);
+  font-size: 16px;
+  line-height: 1.8;
+}
+
+.options-fieldset {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.options {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 36px;
+}
+
+.option {
+  position: relative;
+  display: flex;
+  min-height: 70px;
+  align-items: center;
+  gap: 15px;
+  padding: 16px 18px;
+  border: 1px solid var(--line);
+  background: rgba(255, 253, 248, 0.48);
+  cursor: pointer;
+  font-size: 15px;
+  line-height: 1.52;
+  transition: border-color 160ms ease, background 160ms ease, transform 160ms ease;
+}
+
+.option:last-child:nth-child(odd) {
+  grid-column: 1 / -1;
+}
+
+.option:hover {
+  border-color: rgba(207, 67, 46, 0.58);
+  transform: translateY(-1px);
+}
+
+.option.selected {
+  border-color: var(--red);
+  background: rgba(207, 67, 46, 0.085);
+}
+
+.option input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.choice-mark {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 18px;
+  border: 1px solid var(--ink);
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 4px var(--white);
+  background: transparent;
+}
+
+.choice-mark.square {
+  border-radius: 2px;
+}
+
+.option.selected .choice-mark {
+  border-color: var(--red);
+  background: var(--red);
+}
+
+.other-field {
+  display: block;
+  margin-top: 18px;
+  padding: 20px 22px;
+  border-left: 3px solid var(--red);
+  background: rgba(255, 253, 248, 0.58);
+  animation: reveal 180ms ease both;
+}
+
+.other-field span {
+  display: block;
+  color: var(--red-dark);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+}
+
+.other-field input,
+.contact-input {
+  width: 100%;
+  margin-top: 12px;
+  padding: 12px 0;
+  border: 0;
+  border-bottom: 1px solid var(--ink);
+  outline: 0;
+  background: transparent;
+  color: var(--ink);
+  font-size: 16px;
+}
+
+.other-field input::placeholder,
+.contact-input::placeholder {
+  color: #9a9284;
+}
+
+.contact-panel {
+  margin-top: 28px;
+  padding: 24px;
+  border: 1px solid var(--line);
+  background: var(--white);
+  animation: reveal 180ms ease both;
+}
+
+.contact-heading {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.contact-heading span {
+  padding: 4px 7px;
+  background: var(--paper-deep);
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+}
+
+.contact-heading strong {
+  font-family: "STSong", "Songti SC", "SimSun", serif;
+  font-size: 22px;
+}
+
+.contact-panel p {
+  margin: 10px 0 0;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.consent-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-top: 18px;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 13px;
+  line-height: 1.65;
+}
+
+.consent-row input {
+  width: 17px;
+  height: 17px;
+  flex: 0 0 17px;
+  margin: 2px 0 0;
+  accent-color: var(--red);
+}
+
+.error-message {
+  min-height: 22px;
+  margin-top: 18px;
+  color: transparent;
+  font-size: 13px;
+}
+
+.error-message.visible {
+  color: var(--red-dark);
+}
+
+.question-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 24px;
+  padding-top: 22px;
+  border-top: 1px solid var(--line);
+}
+
+.primary-button,
+.secondary-button,
+.back-button {
+  border: 0;
+  cursor: pointer;
+}
+
+.primary-button {
+  display: inline-flex;
+  min-height: 54px;
+  align-items: center;
+  justify-content: center;
+  gap: 28px;
+  padding: 0 25px;
+  background: var(--ink);
+  color: var(--white);
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  transition: background 160ms ease, transform 160ms ease;
+}
+
+.primary-button:hover:not(:disabled) {
+  background: var(--red);
+  transform: translateY(-1px);
+}
+
+.primary-button:disabled {
+  cursor: wait;
+  opacity: 0.58;
+}
+
+.back-button {
+  padding: 12px 0;
+  background: transparent;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.back-button:disabled {
+  cursor: default;
+  opacity: 0;
+}
+
+.intro-shell,
+.finish-shell {
+  display: grid;
+  min-height: 100vh;
+  place-items: center;
+  padding: 44px 24px;
+  background: var(--ink);
+  color: var(--white);
+}
+
+.intro-shell::before,
+.finish-shell::before {
+  position: absolute;
+  inset: 24px;
+  border: 1px solid rgba(255, 253, 248, 0.16);
+  content: "";
+  pointer-events: none;
+}
+
+.intro-panel,
+.finish-panel {
+  position: relative;
+  z-index: 1;
+  width: min(850px, calc(100% - 32px));
+  text-align: center;
+}
+
+.chapter-mark {
+  margin: 54px 0 -20px;
+  color: rgba(255, 253, 248, 0.09);
+  font-family: Georgia, serif;
+  font-size: clamp(110px, 22vw, 210px);
+  font-weight: 700;
+  letter-spacing: -0.08em;
+  line-height: 0.58;
+}
+
+.intro-panel h1,
+.finish-panel h1 {
+  font-size: clamp(45px, 8vw, 82px);
+  letter-spacing: -0.06em;
+}
+
+.intro-copy,
+.finish-panel > p {
+  max-width: 670px;
+  margin: 28px auto 0;
+  color: rgba(255, 253, 248, 0.72);
+  font-size: 16px;
+  line-height: 1.9;
+}
+
+.intro-meta {
+  display: flex;
+  justify-content: center;
+  gap: 28px;
+  margin-top: 26px;
+  color: rgba(255, 253, 248, 0.58);
+  font-size: 12px;
+}
+
+.privacy-note {
+  max-width: 650px;
+  margin: 20px auto 0;
+  color: rgba(255, 253, 248, 0.42);
+  font-size: 12px;
+  line-height: 1.75;
+}
+
+.start-button {
+  margin-top: 38px;
+  background: var(--red);
+}
+
+.start-button:hover:not(:disabled) {
+  background: #e0523a;
+}
+
+.ambient {
+  position: absolute;
+  border: 1px solid rgba(207, 67, 46, 0.38);
+  border-radius: 50%;
+}
+
+.ambient-one {
+  top: -270px;
+  right: -190px;
+  width: 640px;
+  height: 640px;
+}
+
+.ambient-two {
+  bottom: -380px;
+  left: -250px;
+  width: 720px;
+  height: 720px;
+}
+
+.finish-symbol {
+  display: grid;
+  width: 72px;
+  height: 72px;
+  place-items: center;
+  margin: 0 auto 24px;
+  border: 1px solid var(--red);
+  border-radius: 50%;
+  color: var(--red);
+  font-size: 28px;
+}
+
+.response-card {
+  display: flex;
+  width: min(390px, 100%);
+  align-items: center;
+  justify-content: space-between;
+  margin: 36px auto 0;
+  padding: 20px 24px;
+  border-top: 1px solid rgba(255, 253, 248, 0.2);
+  border-bottom: 1px solid rgba(255, 253, 248, 0.2);
+  color: rgba(255, 253, 248, 0.58);
+  font-size: 13px;
+}
+
+.response-card strong {
+  color: var(--white);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 19px;
+  letter-spacing: 0.12em;
+}
+
+.secondary-button {
+  margin-top: 34px;
+  padding: 14px 20px;
+  border: 1px solid rgba(255, 253, 248, 0.3);
+  background: transparent;
+  color: var(--white);
+}
+
+.admin-shell {
+  width: min(1180px, calc(100% - 48px));
+  min-height: 100vh;
+  margin: 0 auto;
+  padding: 52px 0 80px;
+}
+
+.admin-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 40px;
+  padding-bottom: 28px;
+  border-bottom: 1px solid var(--line);
+}
+
+.admin-kicker {
+  margin: 0;
+  color: var(--red);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+}
+
+.admin-header h1,
+.admin-access-card h1 {
+  margin: 10px 0 0;
+  font-family: "STSong", "Songti SC", "SimSun", serif;
+  font-size: clamp(40px, 7vw, 72px);
+  font-weight: 600;
+  letter-spacing: -0.055em;
+  line-height: 1.08;
+}
+
+.admin-subtitle {
+  max-width: 680px;
+  margin: 18px 0 0;
+  color: var(--muted);
+  line-height: 1.8;
+}
+
+.admin-account {
+  min-width: 250px;
+  padding: 14px 0 2px;
+  border-top: 2px solid var(--ink);
+}
+
+.admin-account span,
+.admin-contact-line span {
+  display: block;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+}
+
+.admin-account strong {
+  display: block;
+  margin-top: 8px;
+  overflow-wrap: anywhere;
+  font-size: 14px;
+}
+
+.admin-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 20px 0;
+}
+
+.admin-button {
+  display: inline-flex;
+  min-height: 45px;
+  align-items: center;
+  justify-content: center;
+  padding: 0 18px;
+  border: 1px solid var(--ink);
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.admin-button.primary {
+  background: var(--ink);
+  color: var(--white);
+}
+
+.admin-button.primary:hover {
+  border-color: var(--red);
+  background: var(--red);
+}
+
+.admin-button.secondary {
+  background: transparent;
+  color: var(--ink);
+}
+
+.admin-button.secondary:hover {
+  border-color: var(--red);
+  color: var(--red-dark);
+}
+
+.admin-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin-top: 20px;
+  border-top: 1px solid var(--line);
+  border-left: 1px solid var(--line);
+}
+
+.admin-stats article {
+  min-height: 138px;
+  padding: 22px;
+  border-right: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  background: rgba(255, 253, 248, 0.42);
+}
+
+.admin-stats span {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.admin-stats strong {
+  display: block;
+  margin-top: 22px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 38px;
+  font-weight: 500;
+}
+
+.admin-responses {
+  margin-top: 70px;
+}
+
+.admin-section-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  padding-bottom: 16px;
+  border-bottom: 3px solid var(--ink);
+}
+
+.admin-section-heading h2 {
+  margin: 7px 0 0;
+  font-family: "STSong", "Songti SC", "SimSun", serif;
+  font-size: 34px;
+  font-weight: 600;
+}
+
+.admin-section-heading > span {
+  color: var(--muted);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+.admin-response-list {
+  display: grid;
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.admin-response-card {
+  padding: 24px;
+  border: 1px solid var(--line);
+  background: rgba(255, 253, 248, 0.62);
+}
+
+.admin-response-card > header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.admin-response-id {
+  margin: 0;
+  color: var(--red);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.admin-response-card h3 {
+  margin: 6px 0 0;
+  font-family: "STSong", "Songti SC", "SimSun", serif;
+  font-size: 25px;
+  font-weight: 600;
+}
+
+.admin-response-card time {
+  color: var(--muted);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.admin-response-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+.admin-response-meta span {
+  padding: 6px 9px;
+  background: var(--paper-deep);
+  color: #4f493e;
+  font-size: 11px;
+}
+
+.admin-response-meta span.muted {
+  background: rgba(207, 67, 46, 0.1);
+  color: var(--red-dark);
+}
+
+.admin-contact-line {
+  display: grid;
+  grid-template-columns: 110px minmax(0, 1fr);
+  gap: 18px;
+  margin-top: 20px;
+  padding: 16px 0;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+
+.admin-contact-line strong {
+  overflow-wrap: anywhere;
+  font-size: 14px;
+}
+
+.admin-details {
+  margin-top: 16px;
+}
+
+.admin-details summary {
+  width: fit-content;
+  color: var(--red-dark);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.admin-details dl {
+  display: grid;
+  gap: 0;
+  margin: 20px 0 0;
+  border-top: 1px solid var(--line);
+}
+
+.admin-details dl > div {
+  display: grid;
+  grid-template-columns: minmax(150px, 0.32fr) minmax(0, 1fr);
+  gap: 24px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.admin-details dt {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.admin-details dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+  font-size: 13px;
+  line-height: 1.65;
+}
+
+.admin-empty {
+  padding: 70px 24px;
+  border-bottom: 1px solid var(--line);
+  text-align: center;
+}
+
+.admin-empty strong {
+  font-family: "STSong", "Songti SC", "SimSun", serif;
+  font-size: 26px;
+}
+
+.admin-empty p {
+  margin: 10px 0 0;
+  color: var(--muted);
+}
+
+.admin-access-shell {
+  display: grid;
+  min-height: 100vh;
+  place-items: center;
+  padding: 32px;
+  background: var(--ink);
+  color: var(--white);
+}
+
+.admin-access-card {
+  width: min(650px, 100%);
+  padding: 50px;
+  border: 1px solid rgba(255, 253, 248, 0.2);
+}
+
+.admin-access-card h1 {
+  font-size: clamp(38px, 7vw, 58px);
+}
+
+.admin-access-card > p:not(.admin-kicker) {
+  margin: 22px 0 28px;
+  color: rgba(255, 253, 248, 0.68);
+  line-height: 1.8;
+}
+
+.admin-access-card .admin-button {
+  border-color: var(--red);
+  background: var(--red);
+}
+
+@keyframes panel-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes reveal {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 720px) {
+  .topbar,
+  .progress-track,
+  .question-panel {
+    width: min(100% - 32px, 820px);
+  }
+
+  .topbar {
+    padding-top: 22px;
+  }
+
+  .question-panel {
+    padding-top: 46px;
+  }
+
+  .question-panel h1 {
+    font-size: clamp(30px, 9.5vw, 43px);
+  }
+
+  .options {
+    grid-template-columns: 1fr;
+    margin-top: 30px;
+  }
+
+  .option:last-child:nth-child(odd) {
+    grid-column: auto;
+  }
+
+  .option {
+    min-height: 64px;
+  }
+
+  .intro-shell,
+  .finish-shell {
+    padding: 54px 16px;
+  }
+
+  .intro-shell::before,
+  .finish-shell::before {
+    inset: 12px;
+  }
+
+  .intro-panel h1,
+  .finish-panel h1 {
+    font-size: clamp(41px, 13vw, 62px);
+  }
+
+  .intro-meta {
+    flex-direction: column;
+    gap: 7px;
+  }
+
+  .question-actions {
+    gap: 20px;
+  }
+
+  .contact-panel {
+    padding: 20px;
+  }
+
+  .admin-shell {
+    width: min(100% - 28px, 1180px);
+    padding-top: 30px;
+  }
+
+  .admin-header,
+  .admin-response-card > header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .admin-account {
+    width: 100%;
+  }
+
+  .admin-actions {
+    justify-content: stretch;
+  }
+
+  .admin-actions .admin-button {
+    flex: 1;
+  }
+
+  .admin-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .admin-stats article {
+    min-height: 122px;
+    padding: 18px;
+  }
+
+  .admin-responses {
+    margin-top: 52px;
+  }
+
+  .admin-response-card {
+    padding: 19px;
+  }
+
+  .admin-response-card time {
+    text-align: left;
+  }
+
+  .admin-contact-line,
+  .admin-details dl > div {
+    grid-template-columns: 1fr;
+    gap: 7px;
+  }
+
+  .admin-access-shell {
+    padding: 16px;
+  }
+
+  .admin-access-card {
+    padding: 30px 24px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation: none !important;
+    transition: none !important;
+  }
+}
