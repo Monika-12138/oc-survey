@@ -1,0 +1,29 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "oc-survey",
+  "account_id": "7a36eba8a3d2995cf2c3c8b6565e1bd3",
+  "main": "worker/index.ts",
+  "compatibility_date": "2026-05-15",
+  "compatibility_flags": ["nodejs_compat"],
+  "workers_dev": true,
+  "preview_urls": false,
+  "observability": {
+    "enabled": true
+  },
+  "assets": {
+    "directory": "dist/client",
+    "not_found_handling": "none",
+    "binding": "ASSETS"
+  },
+  "images": {
+    "binding": "IMAGES"
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "oc-survey-responses",
+      "database_id": "9e9c648b-162c-4584-8516-c5f3034f3dc2",
+      "migrations_dir": "drizzle"
+    }
+  ]
+}
