@@ -4,7 +4,7 @@
   var endpointMeta = document.querySelector('meta[name="survey-endpoint"]');
   var API_ENDPOINT = endpointMeta ? endpointMeta.content.trim() : '';
   var PREVIEW = /(?:\?|&)preview(?:=|&|$)/i.test(window.location.search);
-  var SURVEY_VERSION = '2026-08-05.3';
+  var SURVEY_VERSION = '2026-08-05.4';
 
   var answers = {};
   var history = [];
@@ -27,8 +27,15 @@
   var backButton = document.getElementById('backButton');
   var continueButton = document.getElementById('continueButton');
 
-  function opt(value, label, detail, next, exclusive) {
-    return { value: value, label: label, detail: detail || '', next: next, exclusive: !!exclusive };
+  function opt(value, label, detail, next, exclusive, freeText) {
+    return {
+      value: value,
+      label: label,
+      detail: detail || '',
+      next: next,
+      exclusive: !!exclusive,
+      freeText: !!freeText
+    };
   }
 
   function accessNext() {
@@ -71,7 +78,7 @@
         opt('store_region', 'The App Store page or app is unavailable in my region'),
         opt('technical_problem', 'I had a technical problem downloading or opening it'),
         opt('not_ready', 'I have not had time to try it yet'),
-        opt('other', 'Another reason')
+        opt('other', 'Another reason', '', null, false, true)
       ]
     },
     android_brand: {
@@ -85,7 +92,7 @@
         opt('oppo_oneplus', 'OPPO, OnePlus or realme', '', 'wearable'),
         opt('huawei_honor', 'Huawei or Honor', '', 'wearable'),
         opt('motorola', 'Motorola', '', 'wearable'),
-        opt('other', 'Another Android brand', '', 'wearable'),
+        opt('other', 'Another Android brand', '', 'wearable', false, true),
         opt('not_sure', 'I am not sure', '', 'wearable')
       ]
     },
@@ -100,7 +107,7 @@
         opt('huawei_honor', 'Huawei or Honor wearable', '', 'future_interest'),
         opt('xiaomi', 'Xiaomi wearable', '', 'future_interest'),
         opt('apple_watch', 'Apple Watch', '', 'future_interest'),
-        opt('other', 'Another wearable', '', 'future_interest'),
+        opt('other', 'Another wearable', '', 'future_interest', false, true),
         opt('none', 'I do not use a smartwatch or fitness tracker', '', 'future_interest')
       ]
     },
@@ -116,6 +123,7 @@
         opt('daily_context', 'Connecting sleep, activity and other signals across my day'),
         opt('wearable_support', 'Support for my current watch or fitness tracker'),
         opt('privacy', 'Strong privacy and control over my data'),
+        opt('other', 'Something else', '', null, false, true),
         opt('unsure', 'I am not sure yet', '', null, true)
       ]
     },
@@ -170,6 +178,7 @@
         opt('curious', 'Curious'),
         opt('anxious', 'Anxious'),
         opt('overwhelmed', 'Overwhelmed'),
+        opt('other', 'Another feeling', '', null, false, true),
         opt('no_strong_feeling', 'No strong feeling', '', null, true)
       ],
       next: 'checkin_tone'
@@ -219,6 +228,7 @@
         opt('daily_overview', 'The daily overview'),
         opt('charts', 'Charts and trends'),
         opt('privacy', 'Privacy and control'),
+        opt('other', 'Something else', '', null, false, true),
         opt('nothing_yet', 'Nothing has felt valuable yet', '', null, true)
       ],
       next: 'insight_clarity'
@@ -330,6 +340,7 @@
         opt('notifications', 'Too many, too few or poorly timed notifications'),
         opt('navigation', 'Finding my way around the app'),
         opt('crash_bug', 'A crash, freeze or other technical bug'),
+        opt('other', 'Another problem', '', null, false, true),
         opt('none', 'None of these', '', null, true)
       ],
       next: 'improvement_priority'
@@ -345,6 +356,7 @@
         opt('charts', 'Better charts and trends', '', 'recommend_score'),
         opt('notifications', 'Better notification timing and control', '', 'recommend_score'),
         opt('privacy', 'More privacy controls and explanations', '', 'recommend_score'),
+        opt('other', 'Something else', '', 'recommend_score', false, true),
         opt('nothing_major', 'Nothing major right now', '', 'recommend_score')
       ]
     },
@@ -428,7 +440,10 @@
       input.checked = Array.isArray(selected)
         ? selected.indexOf(option.value) !== -1
         : selected === option.value;
-      if (q.type === 'multi') input.addEventListener('change', handleExclusiveChoice);
+      input.addEventListener('change', function (event) {
+        if (q.type === 'multi') handleExclusiveChoice(event);
+        updateOtherField(q, true);
+      });
 
       var text = document.createElement('span');
       var strong = document.createElement('strong');
@@ -443,6 +458,62 @@
       label.appendChild(text);
       answerArea.appendChild(label);
     });
+
+    if (q.options.some(function (option) { return option.freeText; })) {
+      renderOtherField(q);
+    }
+  }
+
+  function hasFreeTextAnswer(q, value) {
+    var freeTextValues = (q.options || []).filter(function (option) {
+      return option.freeText;
+    }).map(function (option) {
+      return option.value;
+    });
+    if (Array.isArray(value)) {
+      return value.some(function (item) { return freeTextValues.indexOf(item) !== -1; });
+    }
+    return freeTextValues.indexOf(value) !== -1;
+  }
+
+  function renderOtherField(q) {
+    var wrap = document.createElement('div');
+    wrap.className = 'contact-field other-response';
+    wrap.id = 'otherResponse';
+
+    var label = document.createElement('label');
+    label.htmlFor = 'otherResponseInput';
+    label.textContent = 'Please describe your answer';
+
+    var input = document.createElement('input');
+    input.id = 'otherResponseInput';
+    input.name = currentId + '_other_text';
+    input.type = 'text';
+    input.autocomplete = 'off';
+    input.placeholder = 'Type your answer';
+    input.maxLength = 160;
+    input.value = answers[currentId + '_other_text'] || '';
+
+    var note = document.createElement('p');
+    note.className = 'field-note';
+    note.textContent = 'Please do not include health details or other sensitive information.';
+
+    wrap.appendChild(label);
+    wrap.appendChild(input);
+    wrap.appendChild(note);
+    answerArea.appendChild(wrap);
+    updateOtherField(q, false);
+  }
+
+  function updateOtherField(q, focusInput) {
+    var wrap = document.getElementById('otherResponse');
+    if (!wrap) return;
+    var visible = hasFreeTextAnswer(q, readAnswer(q));
+    wrap.hidden = !visible;
+    if (visible && focusInput) {
+      var input = document.getElementById('otherResponseInput');
+      window.setTimeout(function () { input.focus({ preventScroll: true }); }, 0);
+    }
   }
 
   function renderContact(q) {
@@ -495,6 +566,12 @@
   function validateAnswer(q, value) {
     if (q.type === 'multi' && value.length === 0) return 'Please choose at least one option.';
     if ((q.type === 'single' || q.type === 'scale') && !value) return 'Please choose an option.';
+    if (hasFreeTextAnswer(q, value)) {
+      var otherInput = document.getElementById('otherResponseInput');
+      var otherText = otherInput ? otherInput.value.trim() : '';
+      if (!otherText) return 'Please describe your answer.';
+      if (otherText.length > 160) return 'Please keep your answer under 160 characters.';
+    }
     if (q.type === 'contact' && value.length > 254) return 'Please keep the contact detail under 254 characters.';
     return '';
   }
@@ -623,6 +700,12 @@
       return;
     }
     answers[currentId] = value;
+    var otherKey = currentId + '_other_text';
+    if (hasFreeTextAnswer(q, value)) {
+      answers[otherKey] = document.getElementById('otherResponseInput').value.trim();
+    } else {
+      delete answers[otherKey];
+    }
 
     var next = nextFor(q, value);
     if (!next) {
