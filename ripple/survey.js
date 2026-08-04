@@ -1,7 +1,8 @@
 (function () {
   'use strict';
 
-  var API_ENDPOINT = 'https://ripple-core.vercel.app/v1/survey/ripple-experience';
+  var endpointMeta = document.querySelector('meta[name="survey-endpoint"]');
+  var API_ENDPOINT = endpointMeta ? endpointMeta.content.trim() : '';
   var PREVIEW = /(?:\?|&)preview(?:=|&|$)/i.test(window.location.search);
   var SURVEY_VERSION = '2026-08-05';
 
@@ -499,6 +500,9 @@
     }
 
     try {
+      if (!API_ENDPOINT) {
+        throw new Error('This survey is not accepting responses yet. Please use preview mode while the response destination is being connected.');
+      }
       var response = await fetch(API_ENDPOINT, {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
