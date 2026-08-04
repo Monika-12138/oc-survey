@@ -4,7 +4,7 @@
   var endpointMeta = document.querySelector('meta[name="survey-endpoint"]');
   var API_ENDPOINT = endpointMeta ? endpointMeta.content.trim() : '';
   var PREVIEW = /(?:\?|&)preview(?:=|&|$)/i.test(window.location.search);
-  var SURVEY_VERSION = '2026-08-05';
+  var SURVEY_VERSION = '2026-08-05.2';
 
   var answers = {};
   var history = [];
@@ -46,7 +46,7 @@
         opt('iphone', 'iPhone', '', 'download_status'),
         opt('android', 'Android phone', '', 'android_brand'),
         opt('both', 'Both iPhone and Android', '', 'download_status'),
-        opt('other', 'Another phone or no smartphone', '', 'access_barrier')
+        opt('other', 'Another smartphone', '', 'access_barrier')
       ]
     },
     download_status: {
@@ -124,26 +124,22 @@
       section: 'What you need', progress: 62, type: 'single', help: 'Choose one',
       title: 'How likely would you be to try Ripple if it supported your device?',
       options: [
-        opt('very_likely', 'Very likely', '', 'update_preference'),
-        opt('likely', 'Likely', '', 'update_preference'),
-        opt('not_sure', 'Not sure', '', 'update_preference'),
-        opt('unlikely', 'Unlikely', '', 'update_preference'),
-        opt('very_unlikely', 'Very unlikely', '', 'update_preference')
+        opt('very_likely', 'Very likely', '', 'availability_contact'),
+        opt('likely', 'Likely', '', 'availability_contact'),
+        opt('not_sure', 'Not sure', '', 'availability_contact'),
+        opt('unlikely', 'Unlikely', '', 'availability_contact'),
+        opt('very_unlikely', 'Very unlikely', '', 'availability_contact')
       ]
     },
-    update_preference: {
-      section: 'Stay informed', progress: 82, type: 'single', help: 'Optional contact',
+    availability_contact: {
+      section: 'Stay informed', progress: 99, type: 'contact', help: 'Optional',
       title: 'Would you like us to contact you when Ripple becomes available for Android or your device?',
-      description: 'Your answer is optional. We will not use it for general marketing.',
-      options: [
-        opt('email', 'Yes — contact me by email', '', 'contact_email'),
-        opt('phone', 'Yes — contact me by phone', 'Include your country code on the next screen.', 'contact_phone'),
-        opt('none', 'No, I do not want an availability update', '', 'complete')
-      ]
+      description: 'Leave a contact detail below if you would like an update, or leave it blank.',
+      next: 'complete'
     },
 
     usage_length: {
-      section: 'Your experience', progress: 28, type: 'single', help: 'Choose one',
+      section: 'Your experience', progress: 24, type: 'single', help: 'Choose one',
       title: 'How long have you been using Ripple?',
       options: [
         opt('today', 'I opened it for the first time today', '', 'overall_rating'),
@@ -153,18 +149,45 @@
       ]
     },
     overall_rating: {
-      section: 'Your experience', progress: 34, type: 'single', help: 'Choose one',
+      section: 'Your experience', progress: 29, type: 'single', help: 'Choose one',
       title: 'What is your overall impression of Ripple so far?',
       options: [
-        opt('very_positive', 'Very positive', '', 'onboarding_ease'),
-        opt('positive', 'Positive', '', 'onboarding_ease'),
+        opt('very_positive', 'Very positive', '', 'emotional_response'),
+        opt('positive', 'Positive', '', 'emotional_response'),
+        opt('neutral', 'Neutral', '', 'emotional_response'),
+        opt('negative', 'Negative', '', 'emotional_response'),
+        opt('very_negative', 'Very negative', '', 'emotional_response')
+      ]
+    },
+    emotional_response: {
+      section: 'How Ripple feels', progress: 34, type: 'multi', help: 'Choose all that apply',
+      title: 'How does using Ripple usually make you feel?',
+      options: [
+        opt('reassured', 'Reassured'),
+        opt('informed', 'More informed'),
+        opt('in_control', 'More in control'),
+        opt('motivated', 'Motivated'),
+        opt('curious', 'Curious'),
+        opt('anxious', 'Anxious'),
+        opt('overwhelmed', 'Overwhelmed'),
+        opt('no_strong_feeling', 'No strong feeling', '', null, true)
+      ],
+      next: 'checkin_tone'
+    },
+    checkin_tone: {
+      section: 'How Ripple feels', progress: 39, type: 'single', help: 'Choose one',
+      title: 'How do Ripple’s check-ins feel?',
+      options: [
+        opt('very_supportive', 'Very supportive', '', 'onboarding_ease'),
+        opt('mostly_supportive', 'Mostly supportive', '', 'onboarding_ease'),
         opt('neutral', 'Neutral', '', 'onboarding_ease'),
-        opt('negative', 'Negative', '', 'onboarding_ease'),
-        opt('very_negative', 'Very negative', '', 'onboarding_ease')
+        opt('sometimes_intrusive', 'Sometimes intrusive', '', 'onboarding_ease'),
+        opt('too_intrusive', 'Too intrusive', '', 'onboarding_ease'),
+        opt('not_enough', 'I have not received enough check-ins yet', '', 'onboarding_ease')
       ]
     },
     onboarding_ease: {
-      section: 'Your experience', progress: 40, type: 'single', help: 'Choose one',
+      section: 'Your experience', progress: 44, type: 'single', help: 'Choose one',
       title: 'How easy was it to get started?',
       description: 'Think about sign-in, permissions and the first useful screen.',
       options: [
@@ -176,7 +199,7 @@
       ]
     },
     watch_connection: {
-      section: 'Your experience', progress: 46, type: 'single', help: 'Choose one',
+      section: 'Your experience', progress: 49, type: 'single', help: 'Choose one',
       title: 'Were you able to connect Apple Watch health data?',
       options: [
         opt('smooth', 'Yes, and it worked smoothly', '', 'value_features'),
@@ -187,7 +210,7 @@
       ]
     },
     value_features: {
-      section: 'Your experience', progress: 52, type: 'multi', help: 'Choose all that apply',
+      section: 'Your experience', progress: 54, type: 'multi', help: 'Choose all that apply',
       title: 'Which parts of Ripple have felt valuable so far?',
       options: [
         opt('personal_baseline', 'My personal baseline'),
@@ -201,31 +224,67 @@
       next: 'insight_clarity'
     },
     insight_clarity: {
-      section: 'Your experience', progress: 58, type: 'single', help: 'Choose one',
+      section: 'Your experience', progress: 59, type: 'single', help: 'Choose one',
       title: 'How clear are Ripple’s explanations and insights?',
       options: [
-        opt('very_clear', 'Very clear', '', 'trust_level'),
-        opt('clear', 'Clear', '', 'trust_level'),
-        opt('mixed', 'Sometimes clear, sometimes confusing', '', 'trust_level'),
-        opt('confusing', 'Confusing', '', 'trust_level'),
-        opt('very_confusing', 'Very confusing', '', 'trust_level'),
+        opt('very_clear', 'Very clear', '', 'personal_relevance'),
+        opt('clear', 'Clear', '', 'personal_relevance'),
+        opt('mixed', 'Sometimes clear, sometimes confusing', '', 'personal_relevance'),
+        opt('confusing', 'Confusing', '', 'personal_relevance'),
+        opt('very_confusing', 'Very confusing', '', 'personal_relevance'),
+        opt('not_enough', 'I have not seen enough insights yet', '', 'personal_relevance')
+      ]
+    },
+    personal_relevance: {
+      section: 'How Ripple feels', progress: 64, type: 'single', help: 'Choose one',
+      title: 'How personal and relevant do Ripple’s insights feel?',
+      options: [
+        opt('very_relevant', 'Very personal and relevant', '', 'trust_level'),
+        opt('mostly_relevant', 'Mostly relevant', '', 'trust_level'),
+        opt('mixed', 'Mixed', '', 'trust_level'),
+        opt('mostly_generic', 'Mostly generic', '', 'trust_level'),
+        opt('not_relevant', 'Not relevant', '', 'trust_level'),
         opt('not_enough', 'I have not seen enough insights yet', '', 'trust_level')
       ]
     },
     trust_level: {
-      section: 'Your experience', progress: 63, type: 'single', help: 'Choose one',
+      section: 'Your experience', progress: 69, type: 'single', help: 'Choose one',
       title: 'How much do you trust Ripple’s interpretation of your wellness data?',
       options: [
-        opt('a_lot', 'A lot', '', 'noticed_change'),
-        opt('quite_a_bit', 'Quite a bit', '', 'noticed_change'),
-        opt('somewhat', 'Somewhat', '', 'noticed_change'),
-        opt('very_little', 'Very little', '', 'noticed_change'),
-        opt('not_at_all', 'Not at all', '', 'noticed_change'),
-        opt('too_early', 'It is too early for me to judge', '', 'noticed_change')
+        opt('a_lot', 'A lot', '', 'privacy_comfort'),
+        opt('quite_a_bit', 'Quite a bit', '', 'privacy_comfort'),
+        opt('somewhat', 'Somewhat', '', 'privacy_comfort'),
+        opt('very_little', 'Very little', '', 'privacy_comfort'),
+        opt('not_at_all', 'Not at all', '', 'privacy_comfort'),
+        opt('too_early', 'It is too early for me to judge', '', 'privacy_comfort')
+      ]
+    },
+    privacy_comfort: {
+      section: 'How Ripple feels', progress: 73, type: 'single', help: 'Choose one',
+      title: 'How comfortable do you feel with the way Ripple handles your wellness data?',
+      options: [
+        opt('very_comfortable', 'Very comfortable', '', 'action_confidence'),
+        opt('comfortable', 'Comfortable', '', 'action_confidence'),
+        opt('neutral', 'Neutral', '', 'action_confidence'),
+        opt('uncomfortable', 'Uncomfortable', '', 'action_confidence'),
+        opt('very_uncomfortable', 'Very uncomfortable', '', 'action_confidence'),
+        opt('need_information', 'I need more information', '', 'action_confidence')
+      ]
+    },
+    action_confidence: {
+      section: 'How Ripple feels', progress: 77, type: 'single', help: 'Choose one',
+      title: 'How confident do you feel acting on Ripple’s suggestions?',
+      options: [
+        opt('very_confident', 'Very confident', '', 'noticed_change'),
+        opt('confident', 'Confident', '', 'noticed_change'),
+        opt('somewhat_confident', 'Somewhat confident', '', 'noticed_change'),
+        opt('not_very_confident', 'Not very confident', '', 'noticed_change'),
+        opt('would_not_act', 'I would not act on them', '', 'noticed_change'),
+        opt('not_enough', 'I have not received enough suggestions yet', '', 'noticed_change')
       ]
     },
     noticed_change: {
-      section: 'Your experience', progress: 68, type: 'single', help: 'Choose one',
+      section: 'Your experience', progress: 81, type: 'single', help: 'Choose one',
       title: 'Has Ripple helped you notice or understand a change you might otherwise have missed?',
       options: [
         opt('yes_acted', 'Yes, and I changed something I did', '', 'usage_frequency'),
@@ -235,19 +294,31 @@
       ]
     },
     usage_frequency: {
-      section: 'Your experience', progress: 72, type: 'single', help: 'Choose one',
+      section: 'Your experience', progress: 84, type: 'single', help: 'Choose one',
       title: 'How often do you currently open or act on Ripple?',
       options: [
-        opt('multiple_daily', 'Several times a day', '', 'friction'),
-        opt('daily', 'About once a day', '', 'friction'),
-        opt('few_week', 'A few times a week', '', 'friction'),
-        opt('less_week', 'Less than once a week', '', 'friction'),
-        opt('notifications_only', 'Only when Ripple notifies me', '', 'friction'),
-        opt('stopped', 'I have stopped using it', '', 'friction')
+        opt('multiple_daily', 'Several times a day', '', 'daily_fit'),
+        opt('daily', 'About once a day', '', 'daily_fit'),
+        opt('few_week', 'A few times a week', '', 'daily_fit'),
+        opt('less_week', 'Less than once a week', '', 'daily_fit'),
+        opt('notifications_only', 'Only when Ripple notifies me', '', 'daily_fit'),
+        opt('stopped', 'I have stopped using it', '', 'daily_fit')
+      ]
+    },
+    daily_fit: {
+      section: 'How Ripple feels', progress: 87, type: 'single', help: 'Choose one',
+      title: 'How well does Ripple fit into your daily routine?',
+      options: [
+        opt('very_well', 'Very well', '', 'friction'),
+        opt('fairly_well', 'Fairly well', '', 'friction'),
+        opt('somewhat', 'Somewhat', '', 'friction'),
+        opt('poorly', 'Poorly', '', 'friction'),
+        opt('not_at_all', 'Not at all', '', 'friction'),
+        opt('too_early', 'It is too early to tell', '', 'friction')
       ]
     },
     friction: {
-      section: 'Your experience', progress: 76, type: 'multi', help: 'Choose all that apply',
+      section: 'Your experience', progress: 90, type: 'multi', help: 'Choose all that apply',
       title: 'Which problems have you experienced?',
       description: 'Choose “None of these” if everything has worked as expected.',
       options: [
@@ -264,7 +335,7 @@
       next: 'improvement_priority'
     },
     improvement_priority: {
-      section: 'Your experience', progress: 81, type: 'single', help: 'Choose one priority',
+      section: 'Your experience', progress: 92, type: 'single', help: 'Choose one priority',
       title: 'What should we improve first?',
       options: [
         opt('reliability', 'Reliability and health-data sync', '', 'recommend_score'),
@@ -278,52 +349,37 @@
       ]
     },
     recommend_score: {
-      section: 'Your experience', progress: 86, type: 'scale', help: '0 = not at all likely · 10 = extremely likely',
+      section: 'Your experience', progress: 94, type: 'scale', help: '0 = not at all likely · 10 = extremely likely',
       title: 'How likely are you to recommend Ripple to someone who uses an Apple Watch?',
       options: [0,1,2,3,4,5,6,7,8,9,10].map(function (n) { return opt(String(n), String(n), '', 'continue_intent'); })
     },
     continue_intent: {
-      section: 'Your experience', progress: 90, type: 'single', help: 'Choose one',
+      section: 'Your experience', progress: 96, type: 'single', help: 'Choose one',
       title: 'How likely are you to keep using Ripple over the next month?',
       options: [
-        opt('definitely', 'Definitely will', '', 'followup_preference'),
-        opt('probably', 'Probably will', '', 'followup_preference'),
-        opt('not_sure', 'Not sure', '', 'followup_preference'),
-        opt('probably_not', 'Probably will not', '', 'followup_preference'),
-        opt('definitely_not', 'Definitely will not', '', 'followup_preference')
+        opt('definitely', 'Definitely will', '', 'absence_reaction'),
+        opt('probably', 'Probably will', '', 'absence_reaction'),
+        opt('not_sure', 'Not sure', '', 'absence_reaction'),
+        opt('probably_not', 'Probably will not', '', 'absence_reaction'),
+        opt('definitely_not', 'Definitely will not', '', 'absence_reaction')
       ]
     },
-    followup_preference: {
-      section: 'Follow-up', progress: 94, type: 'single', help: 'Optional contact',
-      title: 'May we contact you for a short follow-up about your Ripple experience?',
-      description: 'This is optional and separate from your survey answers.',
+    absence_reaction: {
+      section: 'How Ripple feels', progress: 98, type: 'single', help: 'Choose one',
+      title: 'How would you feel if Ripple were no longer available?',
       options: [
-        opt('email', 'Yes — contact me by email', '', 'contact_email'),
-        opt('phone', 'Yes — contact me by phone', 'Include your country code on the next screen.', 'contact_phone'),
-        opt('none', 'No follow-up, thank you', '', 'complete')
+        opt('very_disappointed', 'Very disappointed', '', 'research_contact'),
+        opt('somewhat_disappointed', 'Somewhat disappointed', '', 'research_contact'),
+        opt('not_disappointed', 'Not disappointed', '', 'research_contact'),
+        opt('no_longer_use', 'I no longer use Ripple', '', 'research_contact'),
+        opt('too_early', 'It is too early to say', '', 'research_contact')
       ]
     },
-
-    contact_email: {
-      section: 'Contact permission', progress: 97, type: 'email', help: 'Contact details are optional',
-      title: 'What email address should we use?',
-      description: 'We will use it only for the update or follow-up you selected.',
-      next: 'contact_consent'
-    },
-    contact_phone: {
-      section: 'Contact permission', progress: 97, type: 'phone', help: 'Contact details are optional',
-      title: 'What phone number should we use?',
-      description: 'Include your country code, for example +65 9123 4567. We will use it only for the purpose you selected.',
-      next: 'contact_consent'
-    },
-    contact_consent: {
-      section: 'Contact permission', progress: 99, type: 'single', help: 'Choose one',
-      title: 'May Ripple use this contact detail for the purpose you selected?',
-      description: 'Choosing “No” removes the contact detail from your submission.',
-      options: [
-        opt('yes', 'Yes, I agree', '', 'complete'),
-        opt('no', 'No, submit my answers without contact details', '', 'complete')
-      ]
+    research_contact: {
+      section: 'Follow-up', progress: 99, type: 'contact', help: 'Optional',
+      title: 'Would you be open to a short follow-up about your Ripple experience?',
+      description: 'Leave a contact detail below if you would like us to reach you, or leave it blank.',
+      next: 'complete'
     }
   };
 
@@ -394,20 +450,19 @@
     wrap.className = 'contact-field';
     var label = document.createElement('label');
     label.htmlFor = 'contactInput';
-    label.textContent = q.type === 'email' ? 'Email address' : 'Phone number';
+    label.textContent = 'Contact detail (optional)';
     var input = document.createElement('input');
     input.id = 'contactInput';
     input.name = currentId;
-    input.type = q.type === 'email' ? 'email' : 'tel';
-    input.autocomplete = q.type === 'email' ? 'email' : 'tel';
-    input.placeholder = q.type === 'email' ? 'you@example.com' : '+65 9123 4567';
-    input.required = true;
-    input.maxLength = q.type === 'email' ? 254 : 40;
+    input.type = 'text';
+    input.autocomplete = 'off';
+    input.placeholder = 'Your contact detail';
+    input.required = false;
+    input.maxLength = 254;
     input.value = answers[currentId] || '';
-    if (q.type === 'phone') input.inputMode = 'tel';
     var note = document.createElement('p');
     note.className = 'field-note';
-    note.textContent = 'Your contact detail is stored privately and is never written to a public GitHub issue or repository file.';
+    note.textContent = 'Leave this blank if you do not want to be contacted. Any detail you enter must be stored privately and never written to a public GitHub issue or repository file.';
     wrap.appendChild(label);
     wrap.appendChild(input);
     wrap.appendChild(note);
@@ -440,13 +495,7 @@
   function validateAnswer(q, value) {
     if (q.type === 'multi' && value.length === 0) return 'Please choose at least one option.';
     if ((q.type === 'single' || q.type === 'scale') && !value) return 'Please choose an option.';
-    if (q.type === 'email') {
-      if (!value || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value) || value.length > 254) return 'Please enter a valid email address.';
-    }
-    if (q.type === 'phone') {
-      var normalized = value.replace(/[()\-\s.]/g, '');
-      if (!/^\+?[1-9]\d{6,14}$/.test(normalized)) return 'Please enter 7–15 digits and include the country code.';
-    }
+    if (q.type === 'contact' && value.length > 254) return 'Please keep the contact detail under 254 characters.';
     return '';
   }
 
@@ -459,11 +508,11 @@
 
   function contactObject() {
     var isUser = answers.download_status === 'downloaded';
-    var preference = isUser ? answers.followup_preference : answers.update_preference;
-    if (answers.contact_consent !== 'yes' || (preference !== 'email' && preference !== 'phone')) return null;
+    var key = isUser ? 'research_contact' : 'availability_contact';
+    var value = (answers[key] || '').trim();
+    if (!value) return null;
     return {
-      type: preference,
-      value: preference === 'email' ? answers.contact_email : answers.contact_phone,
+      value: value,
       purpose: isUser ? 'research_followup' : 'device_availability'
     };
   }
@@ -471,7 +520,7 @@
   function buildPayload() {
     var cleanAnswers = {};
     Object.keys(answers).forEach(function (key) {
-      if (key !== 'contact_email' && key !== 'contact_phone') cleanAnswers[key] = answers[key];
+      if (key !== 'availability_contact' && key !== 'research_contact') cleanAnswers[key] = answers[key];
     });
     var isUser = answers.download_status === 'downloaded';
     return {
@@ -529,9 +578,9 @@
     if (preview) {
       message = 'Preview complete. Nothing was sent or saved.';
     } else if (contact && contact.purpose === 'device_availability') {
-      message = 'You are on the availability list. We will use your chosen contact method only when Ripple supports Android or your device.';
+      message = 'You are on the availability list. We will use your contact detail only when Ripple supports Android or your device.';
     } else if (contact) {
-      message = 'Your feedback is saved. We may use your chosen contact method for the short follow-up you accepted.';
+      message = 'Your feedback is saved. We may use your contact detail for a short follow-up about your Ripple experience.';
     } else {
       message = 'Your answers are saved. No contact details were collected.';
     }
@@ -573,13 +622,7 @@
       validationMessage.textContent = error;
       return;
     }
-    if (q.type === 'email') value = value.toLowerCase();
-    if (q.type === 'phone') value = value.replace(/[()\-\s.]/g, '');
     answers[currentId] = value;
-    if (currentId === 'contact_consent' && value === 'no') {
-      delete answers.contact_email;
-      delete answers.contact_phone;
-    }
 
     var next = nextFor(q, value);
     if (!next) {

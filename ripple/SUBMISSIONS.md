@@ -17,4 +17,4 @@ responses yet” message. `?preview` remains fully functional and never sends
 data anywhere.
 
 Do not use GitHub Issues, repository files, or a client-side GitHub token to
-collect email addresses or phone numbers.
+collect contact details.
