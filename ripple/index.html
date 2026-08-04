@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#071014">
+  <meta name="description" content="Share your Ripple experience or join the Android availability list.">
+  <title>Ripple User Experience Survey</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="preview-banner" id="previewBanner" hidden>
+    Preview mode — responses will not be submitted.
+  </div>
+
+  <div class="ambient ambient-one" aria-hidden="true"></div>
+  <div class="ambient ambient-two" aria-hidden="true"></div>
+
+  <header class="site-header">
+    <a class="brand" href="https://ripple-health-ai.com/" aria-label="Ripple home">
+      <img src="logo.svg" alt="" width="54" height="49">
+      <span>Ripple</span>
+    </a>
+    <span class="header-note">USER EXPERIENCE STUDY</span>
+  </header>
+
+  <main>
+    <section class="intro-shell" id="introScreen">
+      <div class="intro-copy">
+        <p class="eyebrow"><span></span> HELP SHAPE WHAT COMES NEXT</p>
+        <h1>Your experience can make <em>Ripple</em> better.</h1>
+        <p class="lede">
+          Ripple is currently available for iPhone and Apple Watch. Tell us what
+          using it feels like—or join the Android availability list if you cannot
+          access the app yet.
+        </p>
+        <div class="intro-facts" aria-label="Survey details">
+          <div><strong>3–5 min</strong><span>Adaptive survey</span></div>
+          <div><strong>Choice-based</strong><span>No essay questions</span></div>
+          <div><strong>Optional contact</strong><span>Used only with permission</span></div>
+        </div>
+      </div>
+
+      <div class="intro-card">
+        <div class="card-kicker">Before you begin</div>
+        <h2>One survey, two paths</h2>
+        <ul class="path-list">
+          <li><span class="path-number">01</span><span><strong>Cannot access Ripple?</strong> Tell us your device and optionally leave an email or phone number for an Android update.</span></li>
+          <li><span class="path-number">02</span><span><strong>Already using Ripple?</strong> Rate onboarding, clarity, trust, usefulness and what we should improve first.</span></li>
+        </ul>
+
+        <label class="consent-row">
+          <input type="checkbox" id="startConsent">
+          <span>I agree that Ripple may use my answers to improve the product. Any contact detail I choose to provide will only be used for the purpose shown in the survey.</span>
+        </label>
+        <p class="privacy-note">Please do not include health details or other sensitive information. Read the <a href="https://ripple-legal.vercel.app/privacy.html" target="_blank" rel="noreferrer">Privacy Policy</a>.</p>
+        <button class="primary-button" id="startButton" type="button" disabled>
+          Start the survey <span aria-hidden="true">→</span>
+        </button>
+      </div>
+    </section>
+
+    <section class="survey-shell" id="surveyScreen" hidden aria-labelledby="questionTitle">
+      <div class="survey-topline">
+        <div>
+          <span class="section-label" id="sectionLabel">ACCESS</span>
+          <span class="step-label" id="stepLabel">STEP 1</span>
+        </div>
+        <button class="quiet-button" id="restartButton" type="button">Restart</button>
+      </div>
+      <div class="progress-track" aria-hidden="true"><div id="progressBar"></div></div>
+
+      <form class="question-card" id="questionForm" novalidate>
+        <p class="question-help" id="questionHelp"></p>
+        <h1 id="questionTitle" tabindex="-1"></h1>
+        <p class="question-description" id="questionDescription"></p>
+        <div class="answer-area" id="answerArea" role="group" aria-labelledby="questionTitle"></div>
+        <p class="validation-message" id="validationMessage" role="alert" aria-live="polite"></p>
+
+        <div class="survey-actions">
+          <button class="secondary-button" id="backButton" type="button">← Back</button>
+          <button class="primary-button" id="continueButton" type="submit">Continue <span aria-hidden="true">→</span></button>
+        </div>
+      </form>
+    </section>
+
+    <section class="complete-shell" id="completeScreen" hidden aria-live="polite">
+      <div class="success-ripple" aria-hidden="true"><span></span><span></span><span></span><i></i></div>
+      <p class="eyebrow centered"><span></span> RESPONSE RECEIVED</p>
+      <h1>Thank you for helping Ripple listen better.</h1>
+      <p id="completeMessage">Your answers have been recorded.</p>
+      <div class="complete-actions">
+        <a class="primary-button link-button" href="https://ripple-health-ai.com/">Visit Ripple</a>
+        <button class="secondary-button" id="newResponseButton" type="button">Submit another response</button>
+      </div>
+      <details class="preview-output" id="previewOutput" hidden>
+        <summary>Preview submission payload</summary>
+        <pre id="previewJson"></pre>
+      </details>
+    </section>
+
+    <section class="error-shell" id="errorScreen" hidden aria-live="assertive">
+      <p class="eyebrow centered"><span></span> SUBMISSION NOT SENT</p>
+      <h1>We could not save your response.</h1>
+      <p id="errorMessage">Please check your connection and try again.</p>
+      <div class="complete-actions">
+        <button class="secondary-button" id="returnButton" type="button">Return to survey</button>
+        <button class="primary-button" id="retryButton" type="button">Try again</button>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <span>© 2026 Ripple · Team YoRHa</span>
+    <span>Free · Private by design · Not a medical device</span>
+  </footer>
+
+  <input class="honeypot" id="website" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" hidden>
+  <script src="survey.js"></script>
+</body>
+</html>

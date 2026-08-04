@@ -1,7 +1,13 @@
 ﻿# oc-survey
 
-一份关于原创角色（OC / 自设）的问卷样稿。
+This repository hosts two independent surveys:
 
-在线查看：https://monika-12138.github.io/oc-survey/
+- Original Character survey: https://monika-12138.github.io/oc-survey/
+- Ripple user experience survey: https://monika-12138.github.io/oc-survey/ripple/
 
-单文件、无后端，点提交不会真的提交任何数据。
+The original survey remains at the repository root. The Ripple survey lives in
+`/ripple/`, uses adaptive routing, and submits to Ripple's private API rather
+than storing responses in this public repository.
+
+Use `https://monika-12138.github.io/oc-survey/ripple/?preview` to test every
+survey path without sending or storing a response.
