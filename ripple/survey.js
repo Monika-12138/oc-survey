@@ -4,7 +4,7 @@
   var endpointMeta = document.querySelector('meta[name="survey-endpoint"]');
   var API_ENDPOINT = endpointMeta ? endpointMeta.content.trim() : '';
   var PREVIEW = /(?:\?|&)preview(?:=|&|$)/i.test(window.location.search);
-  var SURVEY_VERSION = '2026-08-05.5';
+  var SURVEY_VERSION = '2026-08-05.6';
 
   var answers = {};
   var history = [];
@@ -60,7 +60,7 @@
       title: 'Were you able to download and open Ripple from the Apple App Store?',
       description: 'Choose the answer that best describes what happened when you tried the Apple App Store version.',
       options: [
-        opt('downloaded', 'Yes — I downloaded and opened Ripple', '', 'usage_length'),
+        opt('downloaded', 'Yes — I downloaded and opened Ripple', '', 'usage_status'),
         opt('found_could_not', 'I found it, but could not download or open it', '', 'access_barrier'),
         opt('not_tried', 'I have not tried to download it yet', '', 'access_barrier')
       ]
@@ -144,43 +144,25 @@
       next: 'complete'
     },
 
-    usage_length: {
+    usage_status: {
       section: 'Your experience', progress: 24, type: 'single', help: 'Choose one',
-      title: 'How many days have you used Ripple during this four-day trial?',
-      description: 'Choose only the days you have used Ripple during this first-user trial.',
+      title: 'Have you used Ripple yet?',
+      description: 'Choose Yes only if you have spent enough time in the app to answer questions about your experience.',
       options: [
-        opt('first_day', 'This is my first day', '', 'overall_rating'),
-        opt('two_days', '2 days', '', 'overall_rating'),
-        opt('three_days', '3 days', '', 'overall_rating'),
-        opt('four_days', 'All 4 days', '', 'overall_rating')
+        opt('used', 'Yes — I have used Ripple', '', 'overall_rating'),
+        opt('not_yet', 'No — not yet', '', 'access_barrier')
       ]
     },
     overall_rating: {
       section: 'Your experience', progress: 29, type: 'single', help: 'Choose one',
       title: 'What is your overall impression of Ripple so far?',
       options: [
-        opt('very_positive', 'Very positive', '', 'emotional_response'),
-        opt('positive', 'Positive', '', 'emotional_response'),
-        opt('neutral', 'Neutral', '', 'emotional_response'),
-        opt('negative', 'Negative', '', 'emotional_response'),
-        opt('very_negative', 'Very negative', '', 'emotional_response')
+        opt('very_positive', 'Very positive', '', 'checkin_tone'),
+        opt('positive', 'Positive', '', 'checkin_tone'),
+        opt('neutral', 'Neutral', '', 'checkin_tone'),
+        opt('negative', 'Negative', '', 'checkin_tone'),
+        opt('very_negative', 'Very negative', '', 'checkin_tone')
       ]
-    },
-    emotional_response: {
-      section: 'How Ripple feels', progress: 34, type: 'multi', help: 'Choose all that apply',
-      title: 'How does using Ripple usually make you feel?',
-      options: [
-        opt('reassured', 'Reassured'),
-        opt('informed', 'More informed'),
-        opt('in_control', 'More in control'),
-        opt('motivated', 'Motivated'),
-        opt('curious', 'Curious'),
-        opt('anxious', 'Anxious'),
-        opt('overwhelmed', 'Overwhelmed'),
-        opt('other', 'Another feeling', '', null, false, true),
-        opt('no_strong_feeling', 'No strong feeling', '', null, true)
-      ],
-      next: 'checkin_tone'
     },
     checkin_tone: {
       section: 'How Ripple feels', progress: 39, type: 'single', help: 'Choose one',
@@ -583,7 +565,7 @@
   }
 
   function contactObject() {
-    var isUser = answers.download_status === 'downloaded';
+    var isUser = answers.usage_status === 'used';
     var key = isUser ? 'research_contact' : 'availability_contact';
     var value = (answers[key] || '').trim();
     if (!value) return null;
@@ -598,7 +580,7 @@
     Object.keys(answers).forEach(function (key) {
       if (key !== 'availability_contact' && key !== 'research_contact') cleanAnswers[key] = answers[key];
     });
-    var isUser = answers.download_status === 'downloaded';
+    var isUser = answers.usage_status === 'used';
     return {
       survey_key: 'ripple_experience',
       survey_version: SURVEY_VERSION,
