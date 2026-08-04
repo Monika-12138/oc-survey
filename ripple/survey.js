@@ -4,7 +4,7 @@
   var endpointMeta = document.querySelector('meta[name="survey-endpoint"]');
   var API_ENDPOINT = endpointMeta ? endpointMeta.content.trim() : '';
   var PREVIEW = /(?:\?|&)preview(?:=|&|$)/i.test(window.location.search);
-  var SURVEY_VERSION = '2026-08-05.4';
+  var SURVEY_VERSION = '2026-08-05.5';
 
   var answers = {};
   var history = [];
@@ -62,7 +62,6 @@
       options: [
         opt('downloaded', 'Yes — I downloaded and opened Ripple', '', 'usage_length'),
         opt('found_could_not', 'I found it, but could not download or open it', '', 'access_barrier'),
-        opt('incompatible', 'My iPhone, iOS version or watch setup is not compatible', '', 'access_barrier'),
         opt('not_tried', 'I have not tried to download it yet', '', 'access_barrier')
       ]
     },

@@ -21,7 +21,6 @@ or other sensitive details.
 2. **Were you able to download and open Ripple from the Apple App Store?**
    - Yes — I downloaded and opened Ripple → Product experience Q9
    - I found it, but could not download or open it → Q3
-   - My iPhone, iOS version or watch setup is not compatible → Q3
    - I have not tried to download it yet → Q3
 3. **What is stopping you from using Ripple today?**
    - I mainly use Android
@@ -144,7 +143,7 @@ flowchart TD
   Q1 -->|iPhone or both| Q2{Q2: Downloaded and opened Ripple?}
 
   Q2 -->|Yes| Q9[Q9: Usage length]
-  Q2 -->|No, incompatible, or not tried| Q3
+  Q2 -->|Could not download/open, or not tried| Q3
   Q3 -->|Q1 was both| Q4
   Q3 -->|Q1 was iPhone| Q6[Q6: Desired value]
   Q4 --> Q5[Q5: Wearable]
