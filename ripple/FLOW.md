@@ -1,9 +1,12 @@
 # Ripple User Experience Survey — question flow
 
-All visible survey copy is in English. Core answers use radio buttons,
-checkboxes, or a 0–10 scale. Selected questions include an `Other` option that
-opens a required short-answer field. The contact detail field at the end of
-either route remains optional and may be left blank.
+All visible survey copy is in English. Core answers use radio buttons or
+checkboxes. Selected questions include an `Other` option that opens a required
+short-answer field. The contact detail field at the end of either route is
+optional and may be left blank.
+
+The longest route for someone who has used Ripple is **13 visible questions**,
+including the final optional contact question.
 
 ## Entry and consent
 
@@ -83,48 +86,21 @@ or other sensitive details.
 15. **How clear are Ripple’s explanations and insights?**
     - Very clear / Clear / Sometimes clear, sometimes confusing
     - Confusing / Very confusing / Not enough insights yet
-16. **How personal and relevant do Ripple’s insights feel?**
-    - Very personal and relevant / Mostly relevant / Mixed
-    - Mostly generic / Not relevant / Not enough insights yet
-17. **How much do you trust Ripple’s interpretation of your wellness data?**
+16. **How much do you trust Ripple’s interpretation of your wellness data?**
     - A lot / Quite a bit / Somewhat / Very little / Not at all / Too early to judge
-18. **How comfortable do you feel with the way Ripple handles your wellness data?**
-    - Very comfortable / Comfortable / Neutral / Uncomfortable
-    - Very uncomfortable / I need more information
-19. **How confident do you feel acting on Ripple’s suggestions?**
-    - Very confident / Confident / Somewhat confident / Not very confident
-    - I would not act on them / Not enough suggestions yet
-20. **Has Ripple helped you notice or understand a change you might otherwise have missed?**
-    - Yes, and I changed something / Yes, it helped me understand
-    - Not yet / Too early to tell
-21. **During this four-day trial, how often have you opened or acted on Ripple?**
-    - Only once / A few times in total / About once a day
-    - Several times a day / Only when notified / I am not sure
-22. **How well does Ripple fit into your daily routine?**
-    - Very well / Fairly well / Somewhat / Poorly / Not at all / Too early to tell
-23. **Which problems have you experienced?** Choose all that apply.
-    - Sign-in/account setup / Health permissions / Apple Watch or health-data sync
-    - Slow loading / Unclear or unhelpful explanation / Notification timing
-    - Navigation / Crash, freeze or technical bug
-    - Another problem → required short-answer field
-    - None of these (exclusive)
-24. **What should we improve first?**
+17. **What should we improve first?**
     - Reliability and sync / Clearer explanations / Speed / Next-step suggestions
     - Charts and trends / Notification controls / Privacy explanations
     - Something else → required short-answer field
     - Nothing major
-25. **How likely are you to recommend Ripple to someone who uses an Apple Watch?**
-    - 0 (not at all likely) through 10 (extremely likely)
-26. **How likely are you to keep using Ripple over the next month?**
+18. **How likely are you to keep using Ripple over the next month?**
     - Definitely will / Probably will / Not sure / Probably will not / Definitely will not
-27. **How would you feel if Ripple were no longer available?**
-    - Very disappointed / Somewhat disappointed / Not disappointed
-    - I no longer use Ripple / Too early to say
-28. **Would you be open to a short follow-up about your Ripple experience?**
+19. **Would you be open to a short follow-up about your Ripple experience?**
     - Enter any contact detail → submit choices plus contact with purpose `research_followup`
     - Leave blank → submit choices only
 
-Questions Q10–Q28 are shown only when Q9 is `Yes — I have used Ripple`.
+Questions Q10–Q19 are shown only when Q9 is `Yes — I have used Ripple`.
+Together with Q1, Q2 and Q9, this route contains exactly 13 visible questions.
 Respondents who answer No at Q9 skip all experience questions and return to the
 access and availability route. Contact details are excluded from the public
 answer object and included only in the private `contact` payload when entered.
@@ -157,19 +133,10 @@ flowchart TD
   Q12 --> Q13[Q13: Apple Watch connection]
   Q13 --> Q14[Q14: Valuable features]
   Q14 --> Q15[Q15: Insight clarity]
-  Q15 --> Q16[Q16: Personal relevance]
-  Q16 --> Q17[Q17: Trust]
-  Q17 --> Q18[Q18: Privacy comfort]
-  Q18 --> Q19[Q19: Action confidence]
-  Q19 --> Q20[Q20: Noticed change]
-  Q20 --> Q21[Q21: Usage frequency]
-  Q21 --> Q22[Q22: Daily fit]
-  Q22 --> Q23[Q23: Problems]
-  Q23 --> Q24[Q24: Improvement priority]
-  Q24 --> Q25[Q25: Recommend score]
-  Q25 --> Q26[Q26: Continue intent]
-  Q26 --> Q27[Q27: Loss reaction]
-  Q27 --> Q28[Q28: Optional research contact]
-  Q28 -->|Filled| RC[Submit choices and research contact]
-  Q28 -->|Blank| AS
+  Q15 --> Q16[Q16: Trust]
+  Q16 --> Q17[Q17: Improvement priority]
+  Q17 --> Q18[Q18: Continue intent]
+  Q18 --> Q19[Q19: Optional research contact]
+  Q19 -->|Filled| RC[Submit choices and research contact]
+  Q19 -->|Blank| AS
 ```

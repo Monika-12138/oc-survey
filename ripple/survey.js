@@ -4,7 +4,7 @@
   var endpointMeta = document.querySelector('meta[name="survey-endpoint"]');
   var API_ENDPOINT = endpointMeta ? endpointMeta.content.trim() : '';
   var PREVIEW = /(?:\?|&)preview(?:=|&|$)/i.test(window.location.search);
-  var SURVEY_VERSION = '2026-08-05.6';
+  var SURVEY_VERSION = '2026-08-05.7';
 
   var answers = {};
   var history = [];
@@ -154,7 +154,7 @@
       ]
     },
     overall_rating: {
-      section: 'Your experience', progress: 29, type: 'single', help: 'Choose one',
+      section: 'Your experience', progress: 31, type: 'single', help: 'Choose one',
       title: 'What is your overall impression of Ripple so far?',
       options: [
         opt('very_positive', 'Very positive', '', 'checkin_tone'),
@@ -165,7 +165,7 @@
       ]
     },
     checkin_tone: {
-      section: 'How Ripple feels', progress: 39, type: 'single', help: 'Choose one',
+      section: 'How Ripple feels', progress: 40, type: 'single', help: 'Choose one',
       title: 'How do Ripple’s check-ins feel?',
       options: [
         opt('very_supportive', 'Very supportive', '', 'onboarding_ease'),
@@ -177,7 +177,7 @@
       ]
     },
     onboarding_ease: {
-      section: 'Your experience', progress: 44, type: 'single', help: 'Choose one',
+      section: 'Your experience', progress: 49, type: 'single', help: 'Choose one',
       title: 'How easy was it to get started?',
       description: 'Think about sign-in, permissions and the first useful screen.',
       options: [
@@ -189,7 +189,7 @@
       ]
     },
     watch_connection: {
-      section: 'Your experience', progress: 49, type: 'single', help: 'Choose one',
+      section: 'Your experience', progress: 58, type: 'single', help: 'Choose one',
       title: 'Were you able to connect Apple Watch health data?',
       options: [
         opt('smooth', 'Yes, and it worked smoothly', '', 'value_features'),
@@ -200,7 +200,7 @@
       ]
     },
     value_features: {
-      section: 'Your experience', progress: 54, type: 'multi', help: 'Choose all that apply',
+      section: 'Your experience', progress: 67, type: 'multi', help: 'Choose all that apply',
       title: 'Which parts of Ripple have felt valuable so far?',
       options: [
         opt('personal_baseline', 'My personal baseline'),
@@ -215,157 +215,53 @@
       next: 'insight_clarity'
     },
     insight_clarity: {
-      section: 'Your experience', progress: 59, type: 'single', help: 'Choose one',
+      section: 'Your experience', progress: 76, type: 'single', help: 'Choose one',
       title: 'How clear are Ripple’s explanations and insights?',
       options: [
-        opt('very_clear', 'Very clear', '', 'personal_relevance'),
-        opt('clear', 'Clear', '', 'personal_relevance'),
-        opt('mixed', 'Sometimes clear, sometimes confusing', '', 'personal_relevance'),
-        opt('confusing', 'Confusing', '', 'personal_relevance'),
-        opt('very_confusing', 'Very confusing', '', 'personal_relevance'),
-        opt('not_enough', 'I have not seen enough insights yet', '', 'personal_relevance')
-      ]
-    },
-    personal_relevance: {
-      section: 'How Ripple feels', progress: 64, type: 'single', help: 'Choose one',
-      title: 'How personal and relevant do Ripple’s insights feel?',
-      options: [
-        opt('very_relevant', 'Very personal and relevant', '', 'trust_level'),
-        opt('mostly_relevant', 'Mostly relevant', '', 'trust_level'),
-        opt('mixed', 'Mixed', '', 'trust_level'),
-        opt('mostly_generic', 'Mostly generic', '', 'trust_level'),
-        opt('not_relevant', 'Not relevant', '', 'trust_level'),
+        opt('very_clear', 'Very clear', '', 'trust_level'),
+        opt('clear', 'Clear', '', 'trust_level'),
+        opt('mixed', 'Sometimes clear, sometimes confusing', '', 'trust_level'),
+        opt('confusing', 'Confusing', '', 'trust_level'),
+        opt('very_confusing', 'Very confusing', '', 'trust_level'),
         opt('not_enough', 'I have not seen enough insights yet', '', 'trust_level')
       ]
     },
     trust_level: {
-      section: 'Your experience', progress: 69, type: 'single', help: 'Choose one',
+      section: 'Your experience', progress: 84, type: 'single', help: 'Choose one',
       title: 'How much do you trust Ripple’s interpretation of your wellness data?',
       options: [
-        opt('a_lot', 'A lot', '', 'privacy_comfort'),
-        opt('quite_a_bit', 'Quite a bit', '', 'privacy_comfort'),
-        opt('somewhat', 'Somewhat', '', 'privacy_comfort'),
-        opt('very_little', 'Very little', '', 'privacy_comfort'),
-        opt('not_at_all', 'Not at all', '', 'privacy_comfort'),
-        opt('too_early', 'It is too early for me to judge', '', 'privacy_comfort')
+        opt('a_lot', 'A lot', '', 'improvement_priority'),
+        opt('quite_a_bit', 'Quite a bit', '', 'improvement_priority'),
+        opt('somewhat', 'Somewhat', '', 'improvement_priority'),
+        opt('very_little', 'Very little', '', 'improvement_priority'),
+        opt('not_at_all', 'Not at all', '', 'improvement_priority'),
+        opt('too_early', 'It is too early for me to judge', '', 'improvement_priority')
       ]
-    },
-    privacy_comfort: {
-      section: 'How Ripple feels', progress: 73, type: 'single', help: 'Choose one',
-      title: 'How comfortable do you feel with the way Ripple handles your wellness data?',
-      options: [
-        opt('very_comfortable', 'Very comfortable', '', 'action_confidence'),
-        opt('comfortable', 'Comfortable', '', 'action_confidence'),
-        opt('neutral', 'Neutral', '', 'action_confidence'),
-        opt('uncomfortable', 'Uncomfortable', '', 'action_confidence'),
-        opt('very_uncomfortable', 'Very uncomfortable', '', 'action_confidence'),
-        opt('need_information', 'I need more information', '', 'action_confidence')
-      ]
-    },
-    action_confidence: {
-      section: 'How Ripple feels', progress: 77, type: 'single', help: 'Choose one',
-      title: 'How confident do you feel acting on Ripple’s suggestions?',
-      options: [
-        opt('very_confident', 'Very confident', '', 'noticed_change'),
-        opt('confident', 'Confident', '', 'noticed_change'),
-        opt('somewhat_confident', 'Somewhat confident', '', 'noticed_change'),
-        opt('not_very_confident', 'Not very confident', '', 'noticed_change'),
-        opt('would_not_act', 'I would not act on them', '', 'noticed_change'),
-        opt('not_enough', 'I have not received enough suggestions yet', '', 'noticed_change')
-      ]
-    },
-    noticed_change: {
-      section: 'Your experience', progress: 81, type: 'single', help: 'Choose one',
-      title: 'Has Ripple helped you notice or understand a change you might otherwise have missed?',
-      options: [
-        opt('yes_acted', 'Yes, and I changed something I did', '', 'usage_frequency'),
-        opt('yes_understood', 'Yes, it helped me understand what was happening', '', 'usage_frequency'),
-        opt('not_yet', 'Not yet', '', 'usage_frequency'),
-        opt('too_early', 'It is too early to tell', '', 'usage_frequency')
-      ]
-    },
-    usage_frequency: {
-      section: 'Your experience', progress: 84, type: 'single', help: 'Choose one',
-      title: 'During this four-day trial, how often have you opened or acted on Ripple?',
-      options: [
-        opt('once', 'Only once', '', 'daily_fit'),
-        opt('few_total', 'A few times in total', '', 'daily_fit'),
-        opt('daily', 'About once a day', '', 'daily_fit'),
-        opt('multiple_daily', 'Several times a day', '', 'daily_fit'),
-        opt('notifications_only', 'Only when Ripple notifies me', '', 'daily_fit'),
-        opt('not_sure', 'I am not sure', '', 'daily_fit')
-      ]
-    },
-    daily_fit: {
-      section: 'How Ripple feels', progress: 87, type: 'single', help: 'Choose one',
-      title: 'How well does Ripple fit into your daily routine?',
-      options: [
-        opt('very_well', 'Very well', '', 'friction'),
-        opt('fairly_well', 'Fairly well', '', 'friction'),
-        opt('somewhat', 'Somewhat', '', 'friction'),
-        opt('poorly', 'Poorly', '', 'friction'),
-        opt('not_at_all', 'Not at all', '', 'friction'),
-        opt('too_early', 'It is too early to tell', '', 'friction')
-      ]
-    },
-    friction: {
-      section: 'Your experience', progress: 90, type: 'multi', help: 'Choose all that apply',
-      title: 'Which problems have you experienced?',
-      description: 'Choose “None of these” if everything has worked as expected.',
-      options: [
-        opt('sign_in', 'Sign-in or account setup'),
-        opt('permissions', 'Health permissions'),
-        opt('watch_sync', 'Apple Watch or health-data sync'),
-        opt('slow_loading', 'Slow loading or waiting'),
-        opt('unclear_ai', 'An explanation that felt unclear or unhelpful'),
-        opt('notifications', 'Too many, too few or poorly timed notifications'),
-        opt('navigation', 'Finding my way around the app'),
-        opt('crash_bug', 'A crash, freeze or other technical bug'),
-        opt('other', 'Another problem', '', null, false, true),
-        opt('none', 'None of these', '', null, true)
-      ],
-      next: 'improvement_priority'
     },
     improvement_priority: {
-      section: 'Your experience', progress: 92, type: 'single', help: 'Choose one priority',
+      section: 'Your experience', progress: 91, type: 'single', help: 'Choose one priority',
       title: 'What should we improve first?',
       options: [
-        opt('reliability', 'Reliability and health-data sync', '', 'recommend_score'),
-        opt('clarity', 'Clearer explanations', '', 'recommend_score'),
-        opt('speed', 'Faster responses and loading', '', 'recommend_score'),
-        opt('actions', 'More useful next-step suggestions', '', 'recommend_score'),
-        opt('charts', 'Better charts and trends', '', 'recommend_score'),
-        opt('notifications', 'Better notification timing and control', '', 'recommend_score'),
-        opt('privacy', 'More privacy controls and explanations', '', 'recommend_score'),
-        opt('other', 'Something else', '', 'recommend_score', false, true),
-        opt('nothing_major', 'Nothing major right now', '', 'recommend_score')
+        opt('reliability', 'Reliability and health-data sync', '', 'continue_intent'),
+        opt('clarity', 'Clearer explanations', '', 'continue_intent'),
+        opt('speed', 'Faster responses and loading', '', 'continue_intent'),
+        opt('actions', 'More useful next-step suggestions', '', 'continue_intent'),
+        opt('charts', 'Better charts and trends', '', 'continue_intent'),
+        opt('notifications', 'Better notification timing and control', '', 'continue_intent'),
+        opt('privacy', 'More privacy controls and explanations', '', 'continue_intent'),
+        opt('other', 'Something else', '', 'continue_intent', false, true),
+        opt('nothing_major', 'Nothing major right now', '', 'continue_intent')
       ]
-    },
-    recommend_score: {
-      section: 'Your experience', progress: 94, type: 'scale', help: '0 = not at all likely · 10 = extremely likely',
-      title: 'How likely are you to recommend Ripple to someone who uses an Apple Watch?',
-      options: [0,1,2,3,4,5,6,7,8,9,10].map(function (n) { return opt(String(n), String(n), '', 'continue_intent'); })
     },
     continue_intent: {
       section: 'Your experience', progress: 96, type: 'single', help: 'Choose one',
       title: 'How likely are you to keep using Ripple over the next month?',
       options: [
-        opt('definitely', 'Definitely will', '', 'absence_reaction'),
-        opt('probably', 'Probably will', '', 'absence_reaction'),
-        opt('not_sure', 'Not sure', '', 'absence_reaction'),
-        opt('probably_not', 'Probably will not', '', 'absence_reaction'),
-        opt('definitely_not', 'Definitely will not', '', 'absence_reaction')
-      ]
-    },
-    absence_reaction: {
-      section: 'How Ripple feels', progress: 98, type: 'single', help: 'Choose one',
-      title: 'How would you feel if Ripple were no longer available?',
-      options: [
-        opt('very_disappointed', 'Very disappointed', '', 'research_contact'),
-        opt('somewhat_disappointed', 'Somewhat disappointed', '', 'research_contact'),
-        opt('not_disappointed', 'Not disappointed', '', 'research_contact'),
-        opt('no_longer_use', 'I no longer use Ripple', '', 'research_contact'),
-        opt('too_early', 'It is too early to say', '', 'research_contact')
+        opt('definitely', 'Definitely will', '', 'research_contact'),
+        opt('probably', 'Probably will', '', 'research_contact'),
+        opt('not_sure', 'Not sure', '', 'research_contact'),
+        opt('probably_not', 'Probably will not', '', 'research_contact'),
+        opt('definitely_not', 'Definitely will not', '', 'research_contact')
       ]
     },
     research_contact: {
