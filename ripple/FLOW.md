@@ -18,7 +18,6 @@ or other sensitive details.
    - iPhone → Q2
    - Android phone → Q4
    - Both iPhone and Android → Q2
-   - Another smartphone → Q3
 2. **Were you able to download and open Ripple from the Apple App Store?**
    - Yes — I downloaded and opened Ripple → Product experience Q9
    - I found it, but could not download or open it → Q3
@@ -32,7 +31,7 @@ or other sensitive details.
    - I had a technical problem downloading or opening it
    - I have not had time to try it yet
    - Another reason
-   - Next depends on Q1: Android/both users → Q4; iPhone/another-smartphone users → Q6
+   - Next depends on Q1: both-device users → Q4; iPhone users → Q6
 4. **Which Android phone do you use most often?**
    - Samsung Galaxy / Google Pixel / Xiaomi, Redmi or POCO
    - OPPO, OnePlus or realme / Huawei or Honor / Motorola
@@ -61,8 +60,8 @@ or other sensitive details.
 
 ## Product experience route
 
-9. **How long have you been using Ripple?**
-   - First time today / 2–7 days / 1–4 weeks / More than one month
+9. **How many days have you used Ripple during this four-day trial?**
+   - This is my first day / 2 days / 3 days / All 4 days
 10. **What is your overall impression of Ripple so far?**
     - Very positive / Positive / Neutral / Negative / Very negative
 11. **How does using Ripple usually make you feel?** Choose all that apply.
@@ -97,9 +96,9 @@ or other sensitive details.
 21. **Has Ripple helped you notice or understand a change you might otherwise have missed?**
     - Yes, and I changed something / Yes, it helped me understand
     - Not yet / Too early to tell
-22. **How often do you currently open or act on Ripple?**
-    - Several times a day / About once a day / A few times a week
-    - Less than once a week / Only when notified / I have stopped using it
+22. **During this four-day trial, how often have you opened or acted on Ripple?**
+    - Only once / A few times in total / About once a day
+    - Several times a day / Only when notified / I am not sure
 23. **How well does Ripple fit into your daily routine?**
     - Very well / Fairly well / Somewhat / Poorly / Not at all / Too early to tell
 24. **Which problems have you experienced?** Choose all that apply.
@@ -131,12 +130,11 @@ flowchart TD
   A[Consent] --> Q1{Q1: Main phone}
   Q1 -->|Android| Q4[Q4: Android phone brand]
   Q1 -->|iPhone or both| Q2{Q2: Downloaded and opened Ripple?}
-  Q1 -->|Another smartphone| Q3[Q3: Access barrier]
 
   Q2 -->|Yes| Q9[Q9: Usage length]
   Q2 -->|No, incompatible, or not tried| Q3
-  Q3 -->|Q1 was Android or both| Q4
-  Q3 -->|Q1 was iPhone or another smartphone| Q6[Q6: Desired value]
+  Q3 -->|Q1 was both| Q4
+  Q3 -->|Q1 was iPhone| Q6[Q6: Desired value]
   Q4 --> Q5[Q5: Wearable]
   Q5 --> Q6
   Q6 --> Q7[Q7: Try intent]

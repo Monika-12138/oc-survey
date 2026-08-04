@@ -4,7 +4,7 @@
   var endpointMeta = document.querySelector('meta[name="survey-endpoint"]');
   var API_ENDPOINT = endpointMeta ? endpointMeta.content.trim() : '';
   var PREVIEW = /(?:\?|&)preview(?:=|&|$)/i.test(window.location.search);
-  var SURVEY_VERSION = '2026-08-05.2';
+  var SURVEY_VERSION = '2026-08-05.3';
 
   var answers = {};
   var history = [];
@@ -45,8 +45,7 @@
       options: [
         opt('iphone', 'iPhone', '', 'download_status'),
         opt('android', 'Android phone', '', 'android_brand'),
-        opt('both', 'Both iPhone and Android', '', 'download_status'),
-        opt('other', 'Another smartphone', '', 'access_barrier')
+        opt('both', 'Both iPhone and Android', '', 'download_status')
       ]
     },
     download_status: {
@@ -140,12 +139,13 @@
 
     usage_length: {
       section: 'Your experience', progress: 24, type: 'single', help: 'Choose one',
-      title: 'How long have you been using Ripple?',
+      title: 'How many days have you used Ripple during this four-day trial?',
+      description: 'Choose only the days you have used Ripple during this first-user trial.',
       options: [
-        opt('today', 'I opened it for the first time today', '', 'overall_rating'),
-        opt('two_to_seven_days', '2–7 days', '', 'overall_rating'),
-        opt('one_to_four_weeks', '1–4 weeks', '', 'overall_rating'),
-        opt('more_than_month', 'More than one month', '', 'overall_rating')
+        opt('first_day', 'This is my first day', '', 'overall_rating'),
+        opt('two_days', '2 days', '', 'overall_rating'),
+        opt('three_days', '3 days', '', 'overall_rating'),
+        opt('four_days', 'All 4 days', '', 'overall_rating')
       ]
     },
     overall_rating: {
@@ -295,14 +295,14 @@
     },
     usage_frequency: {
       section: 'Your experience', progress: 84, type: 'single', help: 'Choose one',
-      title: 'How often do you currently open or act on Ripple?',
+      title: 'During this four-day trial, how often have you opened or acted on Ripple?',
       options: [
-        opt('multiple_daily', 'Several times a day', '', 'daily_fit'),
+        opt('once', 'Only once', '', 'daily_fit'),
+        opt('few_total', 'A few times in total', '', 'daily_fit'),
         opt('daily', 'About once a day', '', 'daily_fit'),
-        opt('few_week', 'A few times a week', '', 'daily_fit'),
-        opt('less_week', 'Less than once a week', '', 'daily_fit'),
+        opt('multiple_daily', 'Several times a day', '', 'daily_fit'),
         opt('notifications_only', 'Only when Ripple notifies me', '', 'daily_fit'),
-        opt('stopped', 'I have stopped using it', '', 'daily_fit')
+        opt('not_sure', 'I am not sure', '', 'daily_fit')
       ]
     },
     daily_fit: {
