@@ -1,9 +1,9 @@
 # Ripple User Experience Survey — question flow
 
-All visible survey copy is in English. Every experience question uses radio
-buttons, checkboxes, or a 0–10 scale. The only free-text field is one optional
-contact detail field at the end of either route. A respondent may leave it blank
-and submit normally.
+All visible survey copy is in English. Core answers use radio buttons,
+checkboxes, or a 0–10 scale. Selected questions include an `Other` option that
+opens a required short-answer field. The contact detail field at the end of
+either route remains optional and may be left blank.
 
 ## Entry and consent
 
@@ -30,17 +30,19 @@ or other sensitive details.
    - The App Store page or app is unavailable in my region
    - I had a technical problem downloading or opening it
    - I have not had time to try it yet
-   - Another reason
+   - Another reason → required short-answer field
    - Next depends on Q1: both-device users → Q4; iPhone users → Q6
 4. **Which Android phone do you use most often?**
    - Samsung Galaxy / Google Pixel / Xiaomi, Redmi or POCO
    - OPPO, OnePlus or realme / Huawei or Honor / Motorola
-   - Another Android brand / I am not sure
+   - Another Android brand → required short-answer field
+   - I am not sure
    - Next → Q5
 5. **Which smartwatch or fitness tracker do you use most often?**
    - Samsung Galaxy Watch / Pixel Watch or Fitbit / Garmin
    - Huawei or Honor wearable / Xiaomi wearable / Apple Watch
-   - Another wearable / I do not use a smartwatch or fitness tracker
+   - Another wearable → required short-answer field
+   - I do not use a smartwatch or fitness tracker
    - Next → Q6
 6. **What would make Ripple useful to you?** Choose all that apply.
    - Learning what is normal for my own body
@@ -49,6 +51,7 @@ or other sensitive details.
    - Connecting sleep, activity and other signals across my day
    - Support for my current watch or fitness tracker
    - Strong privacy and control over my data
+   - Something else → required short-answer field
    - I am not sure yet (exclusive)
    - Next → Q7
 7. **How likely would you be to try Ripple if it supported your device?**
@@ -66,7 +69,9 @@ or other sensitive details.
     - Very positive / Positive / Neutral / Negative / Very negative
 11. **How does using Ripple usually make you feel?** Choose all that apply.
     - Reassured / More informed / More in control / Motivated / Curious
-    - Anxious / Overwhelmed / No strong feeling (exclusive)
+    - Anxious / Overwhelmed
+    - Another feeling → required short-answer field
+    - No strong feeling (exclusive)
 12. **How do Ripple’s check-ins feel?**
     - Very supportive / Mostly supportive / Neutral
     - Sometimes intrusive / Too intrusive / Not enough check-ins yet
@@ -78,6 +83,7 @@ or other sensitive details.
     - Personal baseline / AI explanations and evidence
     - Proactive check-ins or notifications / Daily overview
     - Charts and trends / Privacy and control
+    - Something else → required short-answer field
     - Nothing has felt valuable yet (exclusive)
 16. **How clear are Ripple’s explanations and insights?**
     - Very clear / Clear / Sometimes clear, sometimes confusing
@@ -104,10 +110,14 @@ or other sensitive details.
 24. **Which problems have you experienced?** Choose all that apply.
     - Sign-in/account setup / Health permissions / Apple Watch or health-data sync
     - Slow loading / Unclear or unhelpful explanation / Notification timing
-    - Navigation / Crash, freeze or technical bug / None of these (exclusive)
+    - Navigation / Crash, freeze or technical bug
+    - Another problem → required short-answer field
+    - None of these (exclusive)
 25. **What should we improve first?**
     - Reliability and sync / Clearer explanations / Speed / Next-step suggestions
-    - Charts and trends / Notification controls / Privacy explanations / Nothing major
+    - Charts and trends / Notification controls / Privacy explanations
+    - Something else → required short-answer field
+    - Nothing major
 26. **How likely are you to recommend Ripple to someone who uses an Apple Watch?**
     - 0 (not at all likely) through 10 (extremely likely)
 27. **How likely are you to keep using Ripple over the next month?**
@@ -122,6 +132,8 @@ or other sensitive details.
 Questions Q9–Q29 follow the order shown above. Only the initial access questions
 branch. Contact details are excluded from the public answer object and included
 only in the private `contact` payload when the respondent enters a value.
+Conditional `Other` responses are stored next to their question using an
+`_other_text` answer key and are limited to 160 characters.
 
 ## Complete route map
 

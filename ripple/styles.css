@@ -266,6 +266,8 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
   background: rgba(3, 11, 14, .62);
 }
 .contact-field input::placeholder { color: #617572; }
+.other-response { margin-top: 8px; padding: 16px; border: 1px solid rgba(55, 194, 186, .28); border-radius: 15px; background: rgba(55, 194, 186, .06); }
+.other-response[hidden] { display: none; }
 .field-note { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.5; }
 
 .validation-message { min-height: 20px; margin: 15px 0 0; color: #ff928a; font-size: 13px; }
