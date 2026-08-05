@@ -88,11 +88,11 @@ or other sensitive details.
     - Confusing / Very confusing / Not enough insights yet
 16. **How much do you trust Ripple’s interpretation of your wellness data?**
     - A lot / Quite a bit / Somewhat / Very little / Not at all / Too early to judge
-17. **What should we improve first?**
+17. **What do you think we can improve?** Choose all that apply.
     - Reliability and sync / Clearer explanations / Speed / Next-step suggestions
     - Charts and trends / Notification controls / Privacy explanations
     - Something else → required short-answer field
-    - Nothing major
+    - Nothing major (exclusive)
 18. **How likely are you to keep using Ripple over the next month?**
     - Definitely will / Probably will / Not sure / Probably will not / Definitely will not
 19. **Would you be open to a short follow-up about your Ripple experience?**

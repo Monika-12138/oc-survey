@@ -4,7 +4,7 @@
   var endpointMeta = document.querySelector('meta[name="survey-endpoint"]');
   var API_ENDPOINT = endpointMeta ? endpointMeta.content.trim() : '';
   var PREVIEW = /(?:\?|&)preview(?:=|&|$)/i.test(window.location.search);
-  var SURVEY_VERSION = '2026-08-05.7';
+  var SURVEY_VERSION = '2026-08-05.8';
 
   var answers = {};
   var history = [];
@@ -239,19 +239,20 @@
       ]
     },
     improvement_priority: {
-      section: 'Your experience', progress: 91, type: 'single', help: 'Choose one priority',
-      title: 'What should we improve first?',
+      section: 'Your experience', progress: 91, type: 'multi', help: 'Choose all that apply',
+      title: 'What do you think we can improve?',
       options: [
-        opt('reliability', 'Reliability and health-data sync', '', 'continue_intent'),
-        opt('clarity', 'Clearer explanations', '', 'continue_intent'),
-        opt('speed', 'Faster responses and loading', '', 'continue_intent'),
-        opt('actions', 'More useful next-step suggestions', '', 'continue_intent'),
-        opt('charts', 'Better charts and trends', '', 'continue_intent'),
-        opt('notifications', 'Better notification timing and control', '', 'continue_intent'),
-        opt('privacy', 'More privacy controls and explanations', '', 'continue_intent'),
-        opt('other', 'Something else', '', 'continue_intent', false, true),
-        opt('nothing_major', 'Nothing major right now', '', 'continue_intent')
-      ]
+        opt('reliability', 'Reliability and health-data sync'),
+        opt('clarity', 'Clearer explanations'),
+        opt('speed', 'Faster responses and loading'),
+        opt('actions', 'More useful next-step suggestions'),
+        opt('charts', 'Better charts and trends'),
+        opt('notifications', 'Better notification timing and control'),
+        opt('privacy', 'More privacy controls and explanations'),
+        opt('other', 'Something else', '', null, false, true),
+        opt('nothing_major', 'Nothing major right now', '', null, true)
+      ],
+      next: 'continue_intent'
     },
     continue_intent: {
       section: 'Your experience', progress: 96, type: 'single', help: 'Choose one',
